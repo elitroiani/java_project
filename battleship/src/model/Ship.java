@@ -1,6 +1,12 @@
+package model;
+
+import java.util.List;
+import java.awt.Point;
+import java.util.ArrayList;
+
 
 public class Ship {
-
+	
 	//private String name;
 	private int size;
 	private int hits;
@@ -12,4 +18,6 @@ public class Ship {
 	}
 	
 	
+	
+
 }
