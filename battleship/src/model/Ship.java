@@ -5,7 +5,7 @@ import java.awt.Point;
 import java.util.ArrayList;
 
 
-public class Ship {
+public class Ship { //IMPLEMENTS SHIPPLACER
 	
 	//private String name;
 	private int size;
@@ -16,8 +16,19 @@ public class Ship {
 		this.size = size;
 		this.positions = positions;
 	}
+
+	public int getSize() {
+		return this.size;
+	}
+
+	public int getHits() {
+		return this.hits;
+	}
+
+	public List<Point> getPositions() {
+		return this.positions;
+	}
 	
-	
-	
+	 
 
 }
