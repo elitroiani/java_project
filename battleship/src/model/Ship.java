@@ -27,8 +27,6 @@ public class Ship { //IMPLEMENTS SHIPPLACER
 
 	public List<Point> getPositions() {
 		return this.positions;
-	}
-	
-	 
+	}	 
 
 }

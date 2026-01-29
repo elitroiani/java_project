@@ -13,12 +13,13 @@ public abstract class AbstractReasoner implements Reasoner{
     protected final Random random = new Random();
     protected final GameConfig config;
 
-    protected AbstractReasoner(GameConfig config) {
+    protected AbstractReasoner(GameConfig config, GameState state) {
         this.config = config;
+        
     }
 
     protected List<Point> getUntouchedCells(Grid grid) {
-		return null;
+		return grid;
     }
 	
 }
