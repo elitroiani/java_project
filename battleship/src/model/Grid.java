@@ -2,6 +2,8 @@ package model;
 
 public class Grid {
 	
+	private int height;
+	private int width;
 	private Cell[][] cells;
 
 	public int getHeight() {

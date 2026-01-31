@@ -6,10 +6,12 @@ import model.GameConfig;
 import model.GameState;
 
 public class HardReasoner extends AbstractReasoner{
+	
+	private int[][] heatmap;
 
 	public HardReasoner(GameConfig config) {
 		super(config);
-		// TODO Auto-generated constructor stub
+		this.heatmap = new int[config.getWidth()][config.getHeight()];
 	}
 
 	@Override
