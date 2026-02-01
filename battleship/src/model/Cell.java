@@ -14,7 +14,10 @@ public class Cell {
 	public void setState(CellState state) {
 		this.state = state;
 	}
-	
+
+	public Point getCoordinates() {
+		return coordinates;
+	}
 	
 	
 }

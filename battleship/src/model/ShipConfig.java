@@ -23,6 +23,4 @@ public class ShipConfig {
 	public Integer getNum() {
 		return this.num;
 	}
-	
-	
 }
