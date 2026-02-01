@@ -1,15 +1,21 @@
 package model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class GameConfig {
 
-	public int getWidth() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+	private static final int HEIGHT = 10;
+	private static final int WIDTH = 10;
 
 	public int getHeight() {
-		// TODO Auto-generated method stub
-		return 0;
+		return this.HEIGHT;
 	}
+	
+	public int getWidth() {
+		return this.WIDTH;
+	}
+	
+	
 
 }

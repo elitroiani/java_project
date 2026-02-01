@@ -7,18 +7,18 @@ import java.util.ArrayList;
 
 public class Ship { //IMPLEMENTS SHIPPLACER
 	
-	//private String name;
-	private int size;
-	private int hits;
+	private final ShipConfig shipConfig;
 	private List<Point> positions = new ArrayList<>();
+	private Integer hits;
 	
-	public Ship(int size, List<Point> positions) {
-		this.size = size;
+	public Ship(ShipConfig shipConfig, List<Point> positions) {
+		this.shipConfig = shipConfig;
 		this.positions = positions;
 	}
 
-	public int getSize() {
-		return this.size;
+
+	public ShipConfig getShipConfig() {
+		return this.shipConfig;
 	}
 
 	public int getHits() {
