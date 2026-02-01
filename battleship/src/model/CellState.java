@@ -1,5 +1,5 @@
 package model;
 
 public enum CellState {
-	EMPTY, HIT, MISS
+	NOTFIRED, HIT, MISS
 }

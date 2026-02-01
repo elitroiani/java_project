@@ -1,8 +1,11 @@
 package model;
 
+import java.awt.Point;
+
 public class Cell {
 	
-	private CellState state = CellState.EMPTY;
+	private CellState state = CellState.NOTFIRED;
+	private Point coordinates;
 
 	public CellState getState() {
 		return state;
@@ -11,5 +14,7 @@ public class Cell {
 	public void setState(CellState state) {
 		this.state = state;
 	}
+	
+	
 	
 }
