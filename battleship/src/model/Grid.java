@@ -9,6 +9,7 @@ public class Grid {
 	
 	private Cell[][] cells;
 	private List<Ship> ships = new ArrayList<>();
+	// private List<Ship> sunkenShips = new ArrayList<>();
 
 	public boolean isInside(int nx, int ny) {
 		// TODO Auto-generated method stub
