@@ -6,7 +6,7 @@ import java.util.ArrayList;
 public class Ship { // IMPLEMENTS SHIPPLACER
 
 	private final ShipConfig shipConfig;
-	private List<Cell> positions = new ArrayList<>();
+	private final List<Cell> positions = new ArrayList<>();
 	private int hits = 0;
 
 	public Ship(ShipConfig shipConfig, List<Cell> positions) {
@@ -28,5 +28,25 @@ public class Ship { // IMPLEMENTS SHIPPLACER
 	
 	public List<Cell> getPositions() {
 		return this.positions;
+	}
+
+	public void hit() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public int getSize() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	public void setCells(List<Cell> shipCells) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public boolean isSunk() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }
