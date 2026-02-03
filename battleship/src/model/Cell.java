@@ -56,7 +56,7 @@ public class Cell {
         }
         return state;
     }
-    
+ 
     public boolean isFired() {
         return state != CellState.NOTFIRED;
     }
@@ -109,33 +109,5 @@ public class Cell {
 	public Point getCoordinates() {
 		return coordinates;
 	}
-	
-
-    /**
-     * Applica un colpo alla cella.
-     * Il risultato deve essere coerente (HIT o MISS).
-     */
-    public void fire(CellState result) {
-        if (isFired()) {
-            throw new IllegalStateException("Cell already fired at " + coordinates);
-        }
-        if (result == CellState.NOTFIRED) {
-            throw new IllegalArgumentException("Invalid fire result");
-        }
-        this.state = result;
-    }
-    
-    /*
-    public CellState fire() {
-        if (isFired()) throw new IllegalStateException("Already fired");
-        if (ship != null) {
-            state = CellState.HIT;
-        } else {
-            state = CellState.MISS;
-        }
-        return state;
-    }
-    */
-  
     
 }
