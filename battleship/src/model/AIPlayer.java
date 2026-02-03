@@ -13,9 +13,10 @@ public class AIPlayer extends AbstractPlayer {
 		this.reasoner = reasoner;
 	}
 
-//	@Override
-//	public Point chooseMove() {
-//		return this.reasoner.nextMove(); 
-//	}
+
+	@Override
+	public Point chooseMove() {
+		return this.reasoner.chooseMove(); 
+	}
 
 }

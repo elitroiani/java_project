@@ -20,4 +20,5 @@ public abstract class AbstractPlayer implements Player{
 		return this.name;
 	}
 
+	// chooseMove rimane astratto
 }

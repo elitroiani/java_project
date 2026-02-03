@@ -23,7 +23,7 @@ public abstract class AbstractReasoner implements Reasoner{
     }
     
     protected Point randomCellPicker(GameState state) {
-    	Grid enemyGrid = state.getEnemyGrid();
+    	Grid enemyGrid = state.getEnemyGrid(state);
 
     	List<Point> available = getUntouchedCells(enemyGrid);
 

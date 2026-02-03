@@ -1,9 +1,10 @@
 package ai;
 
-import model.GameState;
+//import model.GameState;
+import model.Grid;
 
 import java.awt.Point;
 
 public interface Reasoner {
-	Point chooseMove(GameState state);
+	Point chooseMove();
 }
