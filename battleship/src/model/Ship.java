@@ -52,8 +52,6 @@ public class Ship { // IMPLEMENTS SHIPPLACER
     }
 	
 	
-	
-	
     // --- COLPI ---
     public void hit() {
         this.hits++;

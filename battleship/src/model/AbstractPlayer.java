@@ -1,11 +1,23 @@
 package model;
 
-public class AbstractPlayer implements Player{
+public abstract class AbstractPlayer implements Player{
 
+    protected final String name;
+    protected final Grid grid;
+    
+    public AbstractPlayer(String name, Grid grid) {
+        this.name = name;
+        this.grid = grid;
+    }
+	
 	@Override
 	public Grid getGrid() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.grid;
+	}
+
+	@Override
+	public String getName() {
+		return this.name;
 	}
 
 }
