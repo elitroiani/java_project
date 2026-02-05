@@ -109,5 +109,5 @@ public class Cell {
 	public Point getCoordinates() {
 		return coordinates;
 	}
-    
+   
 }

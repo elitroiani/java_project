@@ -1,4 +1,6 @@
-package model;
+package player;
+
+import model.Grid;
 
 public abstract class AbstractPlayer implements Player{
 

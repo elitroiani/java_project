@@ -1,6 +1,8 @@
-package model;
+package player;
 
 import java.awt.Point;
+
+import model.Grid;
 
 public interface Player {
 

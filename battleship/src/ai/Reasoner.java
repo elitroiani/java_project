@@ -1,7 +1,6 @@
 package ai;
 
-//import model.GameState;
-import model.Grid;
+import model.GameState;
 
 import java.awt.Point;
 

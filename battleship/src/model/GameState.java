@@ -7,6 +7,8 @@ import java.util.List;
 //import java.util.Optional;
 //import java.util.Set;
 
+import player.Player;
+
 public class GameState {
 
 	private final Player humanPlayer;
@@ -68,6 +70,12 @@ public class GameState {
         return humanPlayer.getGrid().allShipsSunk() ? aiPlayer : humanPlayer;
     }
 
+    //METODI AGGIUNTI DA EDDY
+    // pls controllali
+    
+    public List<Ship> enemyShipsRemaining(Player player){
+		return this.getEnemyGrid(player).shipsRemaining();
+    }
 
 	
 	

@@ -1,8 +1,9 @@
-package model;
+package player;
 
 import java.awt.Point;
 
 import ai.Reasoner;
+import model.Grid;
 
 public class AIPlayer extends AbstractPlayer {
 

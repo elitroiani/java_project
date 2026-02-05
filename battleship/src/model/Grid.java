@@ -2,6 +2,7 @@ package model;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Arrays;
 //import java.util.HashSet;
 import java.util.List;
 //import java.util.Set;
@@ -20,7 +21,6 @@ public class Grid {
         ships = new ArrayList<>();
         initCells();
     }*/
-	
 	
 	public Grid(int width, int height) {
         this.width = width;
@@ -66,7 +66,7 @@ public class Grid {
 
             if (!isValidCoordinate(x, y)) return false; // fuori griglia
             Cell cell = getCell(x, y);
-            if (cell.hasShip()) return false; // cella occupata
+            if (cell.hasShip()) return false; 			// cella occupata
             shipCells.add(cell);
         }
 
@@ -117,35 +117,38 @@ public class Grid {
     public List<Ship> getShips() {
         return ships;
     }
-
-	
-	
-	
-	
-	
-	
+    
+    
+    // METODI AGGIUNTI DA EDDY 
+    // Controllali plss
+    
+    public CellState getCellState(int x, int y) {
+    	return this.getCell(x, y).getState();
+    }
+    
+    public List<Cell> getUntouchedCells(){
+    	return Arrays.stream(cells)
+    				 .flatMap(Arrays::stream)
+    				 .filter(s -> s.getState() == CellState.NOTFIRED)
+    				 .toList();
+    }
+    
+    public List<Ship> shipsRemaining(){
+		return this.ships.stream()
+						 .filter(s -> !s.isSunk())
+						 .toList();
+    }
+ 
 	
 /*
-	private void initCells() {
-        for (int x = 0; x < SIZE; x++) {
-            for (int y = 0; y < SIZE; y++) {
-                cells[x][y] = new Cell(new Point(x, y));
-            }
-        }
-    }
-	
-	public boolean isInside(int x, int y) {
-		return x >= 0 && x < SIZE && y >= 0 && y < SIZE;
-	}
-
+ * 
 	public boolean isCellUntouched(int x, int y) {
-		return isInside(x, y) && cells[x][y].getState() == CellState.NOTFIRED;
+		return this.isValidCoordinate(x, y) && !this.getCell(x, y).isFired();
 	}
-
-	public boolean isCellHit(int x, int y) {
-		return isInside(x, y) && cells[x][y].getState() == CellState.HIT;
+    
+    public boolean isCellHit(int x, int y) {
+		return this.isValidCoordinate(x, y) && this.getCell(x, y).isHit();
 	}
-
 
 	public Cell getCell(int row, int column) {
 		return this.cells[row][column];
