@@ -138,6 +138,48 @@ public class Grid {
 						 .filter(s -> !s.isSunk())
 						 .toList();
     }
+    
+    public boolean canPlaceShip(Ship ship) {
+        for (Point p : ship.getPositions()) {
+
+            // 1️ Controllo coordinate valide
+            if (!isValidCoordinate(p.x, p.y)) {
+                return false;
+            }
+
+            // 2️ Controllo che la cella sia libera
+            if (getCellState(p.x, p.y) != CellState.NOTFIRED) {
+                return false;
+            }
+
+            // 3️ Controllo distanza minima: tutte le 8 celle attorno
+            for (int dx = -1; dx <= 1; dx++) {
+                for (int dy = -1; dy <= 1; dy++) {
+
+                    int nx = p.x + dx;
+                    int ny = p.y + dy;
+
+                    // Salta se fuori griglia
+                    if (!isValidCoordinate(nx, ny)) continue;
+
+                    // Salta la cella stessa
+                    if (nx == p.x && ny == p.y) continue;
+
+                    // Se c'è già una nave vicina → non valido
+                    if (getCellState(nx, ny) != CellState.NOTFIRED) {
+                        return false;
+                    }
+                }
+            }
+        }
+        // Tutti i controlli passati → la nave può essere piazzata
+        return true;
+    }
+
+    
+    
+
+
  
 	
 /*

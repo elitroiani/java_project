@@ -1,6 +1,7 @@
 package model;
 
 import java.util.List;
+import java.awt.Point;
 import java.util.ArrayList;
 
 public class Ship { // IMPLEMENTS SHIPPLACER
@@ -30,8 +31,14 @@ public class Ship { // IMPLEMENTS SHIPPLACER
         return this.hits;
     }
     
-	public List<Cell> getPositions() {
+	public List<Cell> getCells() {
 		return List.copyOf(this.positions);    // protegge la lista
+	}
+	
+	public List<Point> getPositions(){
+		return this.positions.stream()
+							 .map(s -> s.getCoordinates())
+							 .toList();
 	}
     
     
