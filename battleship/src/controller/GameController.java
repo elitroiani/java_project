@@ -15,11 +15,12 @@ public class GameController {
 
     private final GameState gameState;
     private Player currentPlayer;
-    private final Scanner scanner = new Scanner(System.in);   //classe java che serve a leggere input
+    private final Scanner scanner;   //classe java che serve a leggere input
 
-    public GameController(GameState gameState, Player startingPlayer) {
+    public GameController(GameState gameState, Player startingPlayer, Scanner scanner) {
         this.gameState = gameState;
         this.currentPlayer = startingPlayer;
+        this.scanner = scanner; // Scanner fornito esternamente per riutilizzo
     }
 
     // --- AVVIO PARTITA ---
