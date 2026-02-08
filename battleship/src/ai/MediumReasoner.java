@@ -85,4 +85,5 @@ public class MediumReasoner extends AbstractReasoner {
             currentDirection = null; // diagonale impossibile
         }
     }
+
 }

@@ -61,12 +61,15 @@ public class Ship { // IMPLEMENTS SHIPPLACER
 	
     // --- COLPI ---
     public void hit() {
-        this.hits++;
+        if (isSunk()) {
+            throw new IllegalStateException("Ship already sunk");
+        }
+        hits++;
     }
 	
 
     public boolean isSunk() {
-        return this.hits >= getSize();
+        return this.hits == getSize();
     }
 	
 	

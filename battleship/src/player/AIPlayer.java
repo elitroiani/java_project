@@ -3,6 +3,7 @@ package player;
 import java.awt.Point;
 
 import ai.Reasoner;
+import model.GameState;
 import model.Grid;
 
 public class AIPlayer extends AbstractPlayer {
@@ -16,8 +17,8 @@ public class AIPlayer extends AbstractPlayer {
 
 
 	@Override
-	public Point chooseMove() {
-		return this.reasoner.chooseMove(); 
+	public Point chooseMove(GameState state) {
+		return this.reasoner.chooseMove(state); 
 	}
 
 }

@@ -21,7 +21,7 @@ public abstract class AbstractShipPlacer implements ShipPlacer {
      * @param grid griglia in cui piazzare
      * @return lista di navi piazzate
      */
-    @Override
+
     public List<Ship> placeShips(Grid grid) {
         List<Ship> placedShips = new ArrayList<>();
 

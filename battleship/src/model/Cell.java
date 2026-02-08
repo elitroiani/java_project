@@ -56,6 +56,10 @@ public class Cell {
     public boolean isFired() {
         return state != CellState.NOTFIRED;
     }
+    
+    public boolean isNotFired() {
+    	return this.state == CellState.NOTFIRED;
+    }
 
     
     public void reset() {

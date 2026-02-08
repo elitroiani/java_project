@@ -78,6 +78,31 @@ public class Grid {
         ships.add(ship);
         return true;
     }
+    
+/* 			QUESTO è QUELLO FATTO DA CHAT
+ *    public boolean canPlaceShip(int startX, int startY, int size, boolean horizontal) {
+        for (int i = 0; i < size; i++) {
+            int x = horizontal ? startX + i : startX;
+            int y = horizontal ? startY : startY + i;
+
+            if (!isValidCoordinate(x, y)) return false;
+            if (getCell(x, y).hasShip()) return false;
+
+            // controllo celle adiacenti
+            for (int dx = -1; dx <= 1; dx++) {
+                for (int dy = -1; dy <= 1; dy++) {
+                    int nx = x + dx;
+                    int ny = y + dy;
+                    if (isValidCoordinate(nx, ny) && getCell(nx, ny).hasShip()) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+*/
+
 	
 	
     // --- COLPI ---

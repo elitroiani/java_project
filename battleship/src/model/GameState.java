@@ -67,7 +67,13 @@ public class GameState {
 
     public Player getWinner() {
         if (!isGameOver()) return null;
-        return humanPlayer.getGrid().allShipsSunk() ? aiPlayer : humanPlayer;
+        if (humanPlayer.getGrid().allShipsSunk()) return aiPlayer;
+        if (aiPlayer.getGrid().allShipsSunk()) return humanPlayer;
+
+        return null; // pareggio teorico
+        
+        //return humanPlayer.getGrid().allShipsSunk() ? aiPlayer : humanPlayer;
+        //Se per assurdo entrambe le griglie fossero affondate (caso limite), vincerebbe sempre l’AI.
     }
 
     //METODI AGGIUNTI DA EDDY

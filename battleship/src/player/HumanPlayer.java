@@ -2,6 +2,7 @@ package player;
 
 import java.awt.Point;
 
+import model.GameState;
 import model.Grid;
 
 public class HumanPlayer extends AbstractPlayer{
@@ -11,9 +12,9 @@ public class HumanPlayer extends AbstractPlayer{
 	}
 
 	@Override
-	public Point chooseMove() {
+	public Point chooseMove(GameState state) {
 		// La mossa reale viene fornita dal Controller
         throw new UnsupportedOperationException("Human move must be provided by the controller");
-    }
+	}
 
 }
