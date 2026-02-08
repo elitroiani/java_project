@@ -1,6 +1,7 @@
 package model;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class GameConfig {
@@ -18,6 +19,11 @@ public class GameConfig {
 	
 	public int getWidth() {
 		return this.WIDTH;
+	}
+
+	public List<Ship> getShipTypes() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 	

@@ -16,10 +16,6 @@ public class Cell {
 		return this.state;
 	}
 
-	public void setState(CellState state) {
-		this.state = state;
-	}
-
     public Ship getShip() {
         return this.ship;
     }

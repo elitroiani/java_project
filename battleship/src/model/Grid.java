@@ -80,7 +80,7 @@ public class Grid {
     }
 	
 	
- // --- COLPI ---
+    // --- COLPI ---
     /**
      * Applica un colpo e ritorna il risultato
      */
@@ -107,15 +107,15 @@ public class Grid {
     }
 
     public int getWidth() {
-        return width;
+        return this.width;
     }
 
     public int getHeight() {
-        return height;
+        return this.width;
     }
 
     public List<Ship> getShips() {
-        return ships;
+        return List.copyOf(this.ships);
     }
     
     
