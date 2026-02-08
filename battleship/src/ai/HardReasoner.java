@@ -17,8 +17,8 @@ public class HardReasoner extends AbstractReasoner {
     private int width, height;
     private Random random = new Random();
 
-    public HardReasoner(Player player, GameConfig config, GameState state) {
-        super(player, config, state);
+    public HardReasoner(Player player, GameConfig config) {
+        super(player, config);
         this.width = config.getWidth();
         this.height = config.getHeight();
         this.heat = new int[width][height];
@@ -26,7 +26,7 @@ public class HardReasoner extends AbstractReasoner {
     }
 
     @Override
-    public Point chooseMove() {
+    public Point chooseMove(GameState state) {
         Grid grid = state.getEnemyGrid(player);
 
         // Aggiorna heat map prima di scegliere

@@ -11,11 +11,11 @@ import player.Player;
 public class EasyReasoner extends AbstractReasoner{
 
 	public EasyReasoner(Player player, GameConfig config, GameState state) {
-		super(player, config, state);
+		super(player, config);
 	}
 
 	@Override
-	public Point chooseMove() {
+	public Point chooseMove(GameState state) {
         return this.randomCellPicker(state);// TODO Auto-generated method stub
 	}
 

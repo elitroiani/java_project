@@ -19,12 +19,12 @@ public class MediumReasoner extends AbstractReasoner {
 
     public enum Direction { UP, DOWN, LEFT, RIGHT }
 
-    public MediumReasoner(Player player, GameConfig config, GameState state) {
-        super(player, config, state);
+    public MediumReasoner(Player player, GameConfig config) {
+        super(player, config);
     }
 
     @Override
-    public Point chooseMove() {
+    public Point chooseMove(GameState state) {
         Grid grid = state.getEnemyGrid(player);
 
         // Pulisco candidati invalidi

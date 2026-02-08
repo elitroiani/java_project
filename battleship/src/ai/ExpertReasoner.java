@@ -19,17 +19,17 @@ public class ExpertReasoner extends AbstractReasoner {
     private final int height;
     private final Random random = new Random();
 
-    public ExpertReasoner(Player player, GameConfig config, GameState state) {
-        super(player, config, state);
+    public ExpertReasoner(Player player, GameConfig config) {
+        super(player, config);
         this.width = config.getWidth();
         this.height = config.getHeight();
         this.probabilityGrid = new double[width][height];
     }
 
     @Override
-    public Point chooseMove() {
+    public Point chooseMove(GameState state) {
         Grid grid = state.getEnemyGrid(player);
-        updateProbability(grid);
+        updateProbability(state);
 
         double max = Double.NEGATIVE_INFINITY;
         List<Point> candidates = new ArrayList<>();
@@ -55,7 +55,7 @@ public class ExpertReasoner extends AbstractReasoner {
         return candidates.get(random.nextInt(candidates.size()));
     }
 
-    private void updateProbability(Grid grid) {
+    private void updateProbability(GameState state) {
 
         // reset heatmap
         for (int y = 0; y < height; y++)
@@ -72,7 +72,7 @@ public class ExpertReasoner extends AbstractReasoner {
             for (int y = 0; y < height; y++) {
                 for (int x = 0; x <= width - size; x++) {
 
-                    if (canPlaceHorizontal(grid, x, y, size)) {
+                    if (canPlaceHorizontal(state.getEnemyGrid(player), x, y, size)) {
                         for (int i = 0; i < size; i++)
                             probabilityGrid[x + i][y]++;
                     }
@@ -83,7 +83,7 @@ public class ExpertReasoner extends AbstractReasoner {
             for (int x = 0; x < width; x++) {
                 for (int y = 0; y <= height - size; y++) {
 
-                    if (canPlaceVertical(grid, x, y, size)) {
+                    if (canPlaceVertical(state.getEnemyGrid(player), x, y, size)) {
                         for (int i = 0; i < size; i++)
                             probabilityGrid[x][y + i]++;
                     }
@@ -109,4 +109,5 @@ public class ExpertReasoner extends AbstractReasoner {
         }
         return true;
     }
+
 }

@@ -16,15 +16,13 @@ public abstract class AbstractReasoner implements Reasoner{
     protected final Random random = new Random();
     protected final Player player;
     protected final GameConfig config;
-    protected final GameState state;
 
-    public AbstractReasoner(Player player, GameConfig config, GameState state) {
+    public AbstractReasoner(Player player, GameConfig config) {
     	this.player = player;
         this.config = config;
-        this.state = state;
     }
     
-    public abstract Point chooseMove();
+    public abstract Point chooseMove(GameState state);
     
     //grid.metodo per avere le celle non toccate;
     protected List<Point> getUntouchedCells(Grid grid) {
