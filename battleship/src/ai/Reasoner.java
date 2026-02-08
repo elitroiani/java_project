@@ -5,5 +5,5 @@ import model.GameState;
 import java.awt.Point;
 
 public interface Reasoner {
-	Point chooseMove();
+	Point chooseMove(GameState state);
 }
