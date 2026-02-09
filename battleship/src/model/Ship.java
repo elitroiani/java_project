@@ -62,7 +62,8 @@ public class Ship { // IMPLEMENTS SHIPPLACER
     // --- COLPI ---
     public void hit() {
         if (isSunk()) {
-            throw new IllegalStateException("Ship already sunk");
+        	return;
+            //throw new IllegalStateException("Ship already sunk");
         }
         hits++;
     }

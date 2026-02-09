@@ -33,14 +33,28 @@ public class GameState {
         return this.getOpponent(player).getGrid();
     }
 	
+    /**
+     * Esegue una mossa del giocatore su una cella
+     * @param player giocatore che spara
+     * @param point coordinate della cella
+     * @return MoveResult del colpo (MISS, HIT_SHIP, SUNK, ALREADY_FIRED)
+     */
+    public MoveResult gameMove(Player player, Point point) {
+        Grid enemyGrid = getEnemyGrid(player);
+        Cell cell = enemyGrid.getCell(point.x, point.y);
+
+        // Restituisce direttamente il risultato del colpo
+        return cell.fire();
+    }
     
+    /*
     // --- ELABORAZIONE MOSSA ---
     public MoveResult gameMove(Player player, Point point) {
     	try {
             Grid enemyGrid = getEnemyGrid(player);
             Cell cell = enemyGrid.getCell(point.x, point.y);
 
-            CellState state = cell.fire(); // può lanciare eccezione
+            MoveResult state = cell.fire(); // può lanciare eccezione
 
             if (state == CellState.MISS) {
                 return MoveResult.MISS;
@@ -58,7 +72,7 @@ public class GameState {
             throw e; // il Controller decide cosa fare
         }
     }
-
+	*/
     
     public boolean isGameOver() {
         return this.humanPlayer.getGrid().allShipsSunk()
@@ -82,7 +96,11 @@ public class GameState {
     public List<Ship> enemyShipsRemaining(Player player){
 		return this.getEnemyGrid(player).shipsRemaining();
     }
-
+    
+    public void reset() {
+        humanPlayer.getGrid().reset();
+        aiPlayer.getGrid().reset();
+    }
 	
 	
 /*

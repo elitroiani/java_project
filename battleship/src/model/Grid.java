@@ -35,6 +35,19 @@ public class Grid {
         }
     }
 	
+	// ---GETTER---
+	public int getWidth() {
+        return this.width;
+    }
+
+    public int getHeight() {
+        return this.width;
+    }
+
+    public List<Ship> getShips() {
+        return List.copyOf(this.ships);
+    }
+	
 	public Cell getCell(int x, int y) {
         if (!isValidCoordinate(x, y)) {
             throw new IndexOutOfBoundsException("Invalid coordinates: " + x + "," + y);
@@ -43,6 +56,7 @@ public class Grid {
     }
 	
 	
+	// ---check---
 	public boolean isValidCoordinate(int x, int y) {
         return x >= 0 && x < width && y >= 0 && y < height;
     }
@@ -109,7 +123,7 @@ public class Grid {
     /**
      * Applica un colpo e ritorna il risultato
      */
-    public CellState fireAt(int x, int y) {
+    public MoveResult fireAt(int x, int y) {
         Cell cell = getCell(x, y);
         return cell.fire();
     }
@@ -131,17 +145,6 @@ public class Grid {
         ships.clear();
     }
 
-    public int getWidth() {
-        return this.width;
-    }
-
-    public int getHeight() {
-        return this.width;
-    }
-
-    public List<Ship> getShips() {
-        return List.copyOf(this.ships);
-    }
     
     
     // METODI AGGIUNTI DA EDDY 

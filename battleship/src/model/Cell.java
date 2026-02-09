@@ -5,8 +5,8 @@ import java.awt.Point;
 public class Cell {
 	
 	private CellState state = CellState.NOTFIRED;
-	private final Point coordinates; //final perché la cella non cambia posizione
-	private Ship ship; // riferimento alla nave presente, null se non c'è
+	private final Point coordinates; 				//final perché la cella non cambia posizione
+	private Ship ship; 								// riferimento alla nave presente, null se non c'è
 	
 	public Cell(Point coordinates) {
         this.coordinates = coordinates;
@@ -15,6 +15,11 @@ public class Cell {
 	public CellState getState() {
 		return this.state;
 	}
+	
+	public Point getCoordinates() {
+		return this.coordinates;
+	}
+	   
 
     public Ship getShip() {
         return this.ship;
@@ -25,7 +30,7 @@ public class Cell {
     }
     
     
- // --- POSIZIONAMENTO DELLA NAVE ---
+    // --- POSIZIONAMENTO DELLA NAVE ---
     public void placeShip(Ship ship) {
         if (this.hasShip()) {
             throw new IllegalStateException("Cell already has a ship at " + coordinates);
@@ -34,23 +39,34 @@ public class Cell {
     }
     
     
- // --- COLPO ---
+    // --- COLPO ---
     /**
      * Applica un colpo alla cella.
      * Se c'è una nave, diventa HIT; altrimenti MISS.
      * @return lo stato aggiornato della cella
      */
-    public CellState fire() {
-        if (isFired()) {
-            throw new IllegalStateException("Cell already fired at " + coordinates);
+    public MoveResult fire() {
+
+        // 1️ mossa non valida → NON cambia stato
+        if (this.state != CellState.NOTFIRED) {
+            return MoveResult.ALREADY_FIRED;
         }
-        if (hasShip()) {
-            state = CellState.HIT;
-            ship.hit(); // aggiorna lo stato della nave
-        } else {
+
+        // 2️ colpo valido
+        if (ship == null) {
             state = CellState.MISS;
+            return MoveResult.MISS;
         }
-        return state;
+
+        // 3️ colpita una nave
+        state = CellState.HIT;
+        ship.hit();
+
+        if (ship.isSunk()) {
+            return MoveResult.SUNK;
+        }
+
+        return MoveResult.HIT;
     }
  
     public boolean isFired() {
@@ -104,10 +120,4 @@ public class Cell {
         return coordinates.hashCode();
     }
     
-    
-
-	public Point getCoordinates() {
-		return coordinates;
-	}
-   
 }
