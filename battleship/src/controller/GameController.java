@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.util.Scanner;
 
 import model.Cell;
+import model.CellState;
 import model.GameState;
 import model.Grid;
 import model.MoveResult;
@@ -34,14 +35,18 @@ public class GameController {
 
         Player winner = gameState.getWinner();
         System.out.println("\n Vincitore: " + winner.getName());
-        //scanner.close();  DA CAPIRE SE VA O MENO
+        //scanner.close();  DA CAPIRE SE VA O MENO, in teoria no
     }
 
     // --- TURNO ---
     private void playTurn() {
     	System.out.println("\nTurno di: " + currentPlayer.getName());
 
-        // Stampa griglia avversario (solo HIT/MISS)
+    	// Stampa griglie
+        System.out.println("\nLa tua griglia:");
+        printOwnGrid(currentPlayer.getGrid());
+
+        System.out.println("\nGriglia nemica:");
         printEnemyGrid(gameState.getEnemyGrid(currentPlayer));
 
         Point move;
@@ -57,9 +62,10 @@ public class GameController {
             try {
                 MoveResult result = gameState.gameMove(currentPlayer, move);
                 printMoveResult(result, move);
+                printShipsRemaining();
                 validMove = true;
             } catch (IllegalStateException e) {
-                System.out.println("❌ Mossa non valida (cella già colpita), riprova.");
+                System.out.println("Mossa non valida (cella già colpita), riprova");
             }
 
         } while (!validMove);
@@ -91,17 +97,8 @@ public class GameController {
         int x = readInt("Inserisci X (0-" + (gameState.getEnemyGrid(currentPlayer).getWidth() - 1) + "): ");
         int y = readInt("Inserisci Y (0-" + (gameState.getEnemyGrid(currentPlayer).getHeight() - 1) + "): ");
         return new Point(x, y);
-    	
-    	
-    	/*System.out.print("Inserisci X: ");
-        int x = scanner.nextInt();
-
-        System.out.print("Inserisci Y: ");
-        int y = scanner.nextInt();
-
-        return new Point(x, y);*/
     }
-
+    
  // --- INPUT ROBUSTO ---
     private int readInt(String prompt) {
         while (true) {
@@ -110,7 +107,7 @@ public class GameController {
                 return scanner.nextInt();
             } else {
                 scanner.next(); // scarta input sbagliato
-                System.out.println("❌ Inserisci un numero valido");
+                System.out.println("Inserisci un numero valido");
             }
         }
     }
@@ -147,6 +144,30 @@ public class GameController {
             System.out.println();
         }
 	}
+    
+ // --- STAMPA GRIGLIA PROPRIA (mostra anche le navi) ---
+    private void printOwnGrid(Grid grid) {
+        for (int y = 0; y < grid.getHeight(); y++) {
+            for (int x = 0; x < grid.getWidth(); x++) {
+                Cell c = grid.getCell(x, y);
+                if (c.hasShip()) {
+                    if (c.getState() == CellState.HIT) {
+                        System.out.print("X "); // nave colpita
+                    } else {
+                        System.out.print("S "); // nave presente
+                    }
+                } else {
+                    System.out.print(c.toSymbol() + " "); // acqua o colpo a vuoto
+                }
+            }
+            System.out.println();
+        }
+    }
+    
+ // --- STAMPA NAVI RIMANENTI ---
+    private void printShipsRemaining() {
+        System.out.println("\nNavi nemiche rimanenti: " + gameState.enemyShipsRemaining(currentPlayer).size());
+    }
 
 }
 
