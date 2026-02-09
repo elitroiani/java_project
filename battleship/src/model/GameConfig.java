@@ -1,31 +1,42 @@
 package model;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
+/**
+ * Configurazione di gioco: dimensioni griglia e tipi di nave
+ */
 public class GameConfig {
 
-	private static final int HEIGHT = 10;
-	private static final int WIDTH = 10;
-	
-	public GameConfig() {
-		
-	}
+    private static final int WIDTH = 10;
+    private static final int HEIGHT = 10;
 
-	public int getHeight() {
-		return this.HEIGHT;
-	}
-	
-	public int getWidth() {
-		return this.WIDTH;
-	}
+    private final List<ShipConfig> shipTypes;
 
-	public List<Ship> getShipTypes() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	
+    public GameConfig() {
+        // Configurazione standard navi
+        shipTypes = new ArrayList<>();
 
+        // esempio classico di battaglia navale
+        shipTypes.add(new ShipConfig("Portaerei", 5, 1));
+        shipTypes.add(new ShipConfig("Corazzata", 4, 1));
+        shipTypes.add(new ShipConfig("Incrociatore", 3, 1));
+        shipTypes.add(new ShipConfig("Sottomarino", 3, 1));
+        shipTypes.add(new ShipConfig("Cacciatorpediniere", 2, 1));
+    }
+
+    public int getWidth() {
+        return WIDTH;
+    }
+
+    public int getHeight() {
+        return HEIGHT;
+    }
+
+    /**
+     * Restituisce la lista dei tipi di nave con size e count
+     */
+    public List<ShipConfig> getShipTypes() {
+        return new ArrayList<>(shipTypes); // restituisce copia per sicurezza
+    }
 }
