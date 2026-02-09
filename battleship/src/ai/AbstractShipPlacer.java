@@ -4,14 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import model.GameConfig;
+import model.GameState;
 import model.Grid;
 import model.Ship;
 import model.ShipConfig;
+import player.Player;
 
 /**
- * Classe astratta che gestisce il piazzamento delle navi
- * Definisce il template method "placeShips" e lascia a sottoclassi
- * la decisione di posizione e orientamento per ogni nave.
+ * Classe astratta per piazzare le navi di un giocatore
+ * Implementa la logica di piazzamento generale e lascia
+ * alle sottoclassi la decisione di startX, startY e orientamento
  */
 public abstract class AbstractShipPlacer implements ShipPlacer {
 
@@ -22,32 +24,32 @@ public abstract class AbstractShipPlacer implements ShipPlacer {
     }
 
     /**
-     * Template method per piazzare tutte le navi definite in GameConfig
-     * @param grid griglia su cui piazzare le navi
+     * Template method per piazzare tutte le navi di un giocatore
+     * @param gameState stato corrente della partita
+     * @param player giocatore su cui piazzare le navi
      * @return lista di navi piazzate
      */
-    public List<Ship> placeShips(Grid grid) {
+    @Override
+    public List<Ship> placeShips(GameState gameState, Player player) {
         List<Ship> placedShips = new ArrayList<>();
+        Grid grid = player.getGrid(); // ottieni la griglia del giocatore
 
-        // Cicla su tutti i tipi di nave definiti nel GameConfig
         for (ShipConfig shipConfig : config.getShipTypes()) {
             String type = shipConfig.getName();
             int size = shipConfig.getSize();
-            int count = shipConfig.getCount(); // <--- usa "count" ora
+            int count = shipConfig.getCount();
 
             for (int i = 0; i < count; i++) {
                 boolean placed = false;
                 int attempts = 0;
 
-                while (!placed && attempts < 100) { // evita loop infinito
-                    Ship ship = new Ship(shipConfig); // crea la nave
+                while (!placed && attempts < 100) {
+                    Ship ship = new Ship(shipConfig);
 
-                    // Sottoclasse decide startX, startY e orientamento
-                    int startX = getStartX(grid, ship);
-                    int startY = getStartY(grid, ship);
-                    boolean horizontal = isHorizontal(grid, ship);
+                    int startX = getStartX(gameState, player, ship);
+                    int startY = getStartY(gameState, player, ship);
+                    boolean horizontal = isHorizontal(gameState, player, ship);
 
-                    // prova a piazzare la nave sulla griglia
                     if (grid.placeShip(ship, startX, startY, horizontal)) {
                         placedShips.add(ship);
                         placed = true;
@@ -57,7 +59,7 @@ public abstract class AbstractShipPlacer implements ShipPlacer {
                 }
 
                 if (!placed) {
-                    throw new IllegalStateException("Impossibile piazzare la nave " + type);
+                    throw new IllegalStateException("Impossibile piazzare la nave " + type + " per il giocatore " + player.getName());
                 }
             }
         }
@@ -65,20 +67,14 @@ public abstract class AbstractShipPlacer implements ShipPlacer {
         return placedShips;
     }
 
-    // --- METODI ASTRATTI PER LE SOTTOCLASSI ---
+    // --- METODI ASTRATTI CHE LE SOTTOCLASSI DEVONO IMPLEMENTARE ---
 
-    /**
-     * Restituisce la coordinata X di partenza per la nave
-     */
-    protected abstract int getStartX(Grid grid, Ship ship);
+    @Override
+    public abstract int getStartX(GameState gameState, Player player, Ship ship);
 
-    /**
-     * Restituisce la coordinata Y di partenza per la nave
-     */
-    protected abstract int getStartY(Grid grid, Ship ship);
+    @Override
+    public abstract int getStartY(GameState gameState, Player player, Ship ship);
 
-    /**
-     * Decide se la nave sarà orizzontale o verticale
-     */
-    protected abstract boolean isHorizontal(Grid grid, Ship ship);
+    @Override
+    public abstract boolean isHorizontal(GameState gameState, Player player, Ship ship);
 }
