@@ -13,17 +13,15 @@ public class GameState {
 
 	private final Player humanPlayer;
 	private final Player aiPlayer;
+	private final GameConfig config; // ← aggiunto
 	//private Player currentPlayer;
 	
-	public GameState(Player humanPlayer, Player aiPlayer) {
-		this.humanPlayer = humanPlayer;
-		this.aiPlayer = aiPlayer;
-		//this.currentPlayer = humanPlayer; //parte prima la persona
-	}
+	public GameState(Player humanPlayer, Player aiPlayer, GameConfig config) {
+        this.humanPlayer = humanPlayer;
+        this.aiPlayer = aiPlayer;
+        this.config = config;
+    }
 	
-    /*public Player getCurrentPlayer() {
-        return this.currentPlayer;
-    }*/
 	
     public Player getOpponent(Player player) {
         return player == this.humanPlayer ? this.aiPlayer : this.humanPlayer;
@@ -101,6 +99,16 @@ public class GameState {
         humanPlayer.getGrid().reset();
         aiPlayer.getGrid().reset();
     }
+    
+    public Player getHumanPlayer() { 
+    	return humanPlayer; 
+    }
+    public Player getAiPlayer() { 
+    	return aiPlayer; 
+    }
+    public GameConfig getConfig() { 
+    	return config; 
+    } // ← getter per il GameConfig
 	
 	
 /*

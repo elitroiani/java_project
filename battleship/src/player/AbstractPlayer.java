@@ -1,11 +1,13 @@
 package player;
 
+import ai.Reasoner;
 import model.Grid;
 
 public abstract class AbstractPlayer implements Player{
 
     protected final String name;
     protected final Grid grid;
+    protected Reasoner reasoner;
     
     public AbstractPlayer(String name, Grid grid) {
     	if (name == null || name.isBlank()) {
@@ -26,6 +28,10 @@ public abstract class AbstractPlayer implements Player{
 	@Override
 	public String getName() {
 		return this.name;
+	}
+	
+	public void setReasoner(Reasoner reasoner ) {
+		this.reasoner = reasoner;
 	}
 
 	// chooseMove rimane astratto

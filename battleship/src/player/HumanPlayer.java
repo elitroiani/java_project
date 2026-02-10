@@ -6,7 +6,7 @@ import model.GameState;
 import model.Grid;
 
 public class HumanPlayer extends AbstractPlayer{
-
+	
 	public HumanPlayer(String name, Grid grid) {
 		super(name, grid);
 	}

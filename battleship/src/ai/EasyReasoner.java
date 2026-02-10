@@ -10,7 +10,7 @@ import player.Player;
 
 public class EasyReasoner extends AbstractReasoner{
 
-	public EasyReasoner(Player player, GameConfig config, GameState state) {
+	public EasyReasoner(Player player, GameConfig config) {
 		super(player, config);
 	}
 
