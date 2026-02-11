@@ -49,7 +49,7 @@ public class GameController {
         switch (aiDifficulty.toLowerCase()) {
             case "easy" -> {
                 aiPlacer = new RandomShipPlacer(gameState.getConfig());
-                aiPlayer.setReasoner(new EasyReasoner(humanPlayer, null, gameState));
+                aiPlayer.setReasoner(new EasyReasoner(humanPlayer, null));
             }
             case "medium" -> {
                 aiPlacer = new HardShipPlacer(gameState.getConfig());
@@ -65,7 +65,7 @@ public class GameController {
             }
             default -> {
                 aiPlacer = new RandomShipPlacer(gameState.getConfig());
-                aiPlayer.setReasoner(new EasyReasoner(humanPlayer, null, gameState));
+                aiPlayer.setReasoner(new EasyReasoner(humanPlayer, null));
             }
         }
         aiPlacer.placeAllShips(gameState, aiPlayer);
