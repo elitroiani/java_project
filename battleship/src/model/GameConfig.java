@@ -39,4 +39,8 @@ public class GameConfig {
     public List<ShipConfig> getShipTypes() {
         return new ArrayList<>(shipTypes); // restituisce copia per sicurezza
     }
+
+	public int getGridSize() {
+		return this.WIDTH;
+	}
 }

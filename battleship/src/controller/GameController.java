@@ -170,10 +170,10 @@ public class GameController {
             System.out.print(prompt);
             if (scanner.hasNextInt()) {
                 int value = scanner.nextInt();
-                scanner.nextLine(); // pulizia buffer
+                scanner.nextLine(); 							// pulizia buffer
                 return value;
             }
-            scanner.next(); // scarta input errato
+            scanner.next(); 									// scarta input errato
             System.out.println("Inserisci un numero valido");
         }
     }

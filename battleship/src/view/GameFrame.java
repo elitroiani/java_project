@@ -5,7 +5,11 @@ import java.awt.*;
 
 public class GameFrame extends JFrame {
 
-    private final GridPanel playerGridPanel;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private final GridPanel playerGridPanel;
     private final GridPanel enemyGridPanel;
     private final JLabel statusLabel;
 
