@@ -15,7 +15,7 @@ public class HardReasoner extends AbstractReasoner {
 
     private int[][] heat;
     private int width, height;
-    private Random random = new Random();
+    //private Random random = new Random();  RIMUOVO PERCHè è EREDITATO DA ABSTRACTREASONER
 
     public HardReasoner(Player player, GameConfig config) {
         super(player, config);
