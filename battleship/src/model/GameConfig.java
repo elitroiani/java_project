@@ -4,28 +4,32 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Configurazione di gioco: dimensioni griglia e tipi di nave
+ * Global game configuration settings, including grid dimensions and ship fleet composition.
  */
 public class GameConfig {
 
+    // Default grid and gameplay constants
     private static final int WIDTH = 10;
     private static final int HEIGHT = 10;
     private static final int NUMBER_OF_SHIPS = 5;
 
     private final List<ShipConfig> shipTypes;
 
+    /**
+     * Initializes the standard configuration with a classic battleship fleet.
+     */
     public GameConfig() {
-        // Configurazione standard navi
-        shipTypes = new ArrayList<>();
+        this.shipTypes = new ArrayList<>();
 
-        // esempio classico di battaglia navale
-        shipTypes.add(new ShipConfig("Portaerei", 5, 1));
-        shipTypes.add(new ShipConfig("Corazzata", 4, 1));
-        shipTypes.add(new ShipConfig("Incrociatore", 3, 1));
-        shipTypes.add(new ShipConfig("Sottomarino", 3, 1));
-        shipTypes.add(new ShipConfig("Cacciatorpediniere", 2, 1));
+        // Standard fleet composition: Name, Size, and Quantity
+        shipTypes.add(new ShipConfig("Carrier", 5, 1));
+        shipTypes.add(new ShipConfig("Battleship", 4, 1));
+        shipTypes.add(new ShipConfig("Cruiser", 3, 1));
+        shipTypes.add(new ShipConfig("Submarine", 3, 1));
+        shipTypes.add(new ShipConfig("Destroyer", 2, 1));
     }
 
+    // --- GETTERS ---
     public int getWidth() {
         return WIDTH;
     }
@@ -33,19 +37,21 @@ public class GameConfig {
     public int getHeight() {
         return HEIGHT;
     }
-
-    /**
-     * Restituisce la lista dei tipi di nave con size e count
-     */
-    public List<ShipConfig> getShipTypes() {
-        return new ArrayList<>(shipTypes); // restituisce copia per sicurezza
+    
+    public int getGridSize() {
+        return WIDTH;
+    }
+    
+    public int getShips() {
+        return NUMBER_OF_SHIPS;
     }
 
-	public int getGridSize() {
-		return this.WIDTH;
-	}
-	
-	public int getShips() {
-		return GameConfig.NUMBER_OF_SHIPS;
-	}
+    /**
+     * Returns a copy of the ship configurations to ensure the internal list 
+     * remains immutable from outside the class.
+     * @return A list of ship types and their properties.
+     */
+    public List<ShipConfig> getShipTypes() {
+        return new ArrayList<>(shipTypes); 
+    }
 }

@@ -6,8 +6,14 @@ import java.util.List;
 import model.*;
 import player.Player;
 
+/**
+ * Expert-level AI that uses a Probability Density Map to determine the best move.
+ * It calculates the likelihood of a ship being present in each cell based on 
+ * remaining ships and current grid state (Hits and Misses).
+ */
 public class ExpertReasoner extends AbstractReasoner {
     
+    /** Matrix storing the probability score for each cell */
     private final double[][] probabilityGrid;
     private final int width;
     private final int height;
@@ -22,6 +28,8 @@ public class ExpertReasoner extends AbstractReasoner {
     @Override
     public Point chooseMove(GameState state) {
         Grid grid = state.getEnemyGrid(player);
+        
+        // Recalculate probabilities for the entire grid based on the current state
         updateProbability(state);
         
         double max = -1.0;
@@ -29,10 +37,11 @@ public class ExpertReasoner extends AbstractReasoner {
         
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                // Spara solo dove non ha mai sparato
+                // Only consider cells that haven't been targeted yet
                 if (grid.getCellState(x, y) != CellState.NOTFIRED) continue;
                 
                 double value = probabilityGrid[x][y];
+                // Identify cells with the highest probability score
                 if (value > max) {
                     max = value;
                     candidates.clear();
@@ -43,14 +52,19 @@ public class ExpertReasoner extends AbstractReasoner {
             }
         }
         
-        // Se non ci sono candidati (caso limite), spara a caso tra i rimanenti
+        // Fallback to a random valid move if no candidates are found (edge case)
         if (candidates.isEmpty()) return getRandomMove(grid);
         
+        // Pick one coordinate randomly among those with the highest probability
         return candidates.get(random.nextInt(candidates.size()));
     }
     
+    /**
+     * Resets and updates the probability grid by simulating all possible placements 
+     * for every remaining enemy ship.
+     */
     private void updateProbability(GameState state) {
-        // Reset griglia
+        // Clear the probability grid for a fresh calculation
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) probabilityGrid[x][y] = 0;
         }
@@ -61,7 +75,7 @@ public class ExpertReasoner extends AbstractReasoner {
         for (Ship ship : remainingShips) {
             int size = ship.getSize();
             
-            // Analisi Orizzontale
+            // Analyze all possible horizontal placements
             for (int y = 0; y < height; y++) {
                 for (int x = 0; x <= width - size; x++) {
                     PlacementResult result = checkPlacement(grid, x, y, size, true);
@@ -71,7 +85,7 @@ public class ExpertReasoner extends AbstractReasoner {
                 }
             }
             
-            // Analisi Verticale
+            // Analyze all possible vertical placements
             for (int x = 0; x < width; x++) {
                 for (int y = 0; y <= height - size; y++) {
                     PlacementResult result = checkPlacement(grid, x, y, size, false);
@@ -83,9 +97,13 @@ public class ExpertReasoner extends AbstractReasoner {
         }
     }
 
+    /**
+     * Adds weight to the probability grid for a valid potential ship placement.
+     * Hits significantly increase the weight to prioritize sinking identified ships.
+     */
     private void applyWeight(int x, int y, int size, boolean horizontal, int hitCount) {
-        // Logica Direzionale: Se hitCount è 2, il peso è molto più alto che se fosse 1.
-        // Se hitCount è 0, il peso è 1 (ricerca standard).
+        // If the placement overlaps with existing hits, increase weight exponentially
+        // hitCount 0 = weight 1.0 (searching); hitCount > 0 = weight 20^hitCount (targeting)
         double weight = (hitCount == 0) ? 1.0 : Math.pow(20.0, hitCount);
         
         for (int i = 0; i < size; i++) {
@@ -95,6 +113,10 @@ public class ExpertReasoner extends AbstractReasoner {
         }
     }
 
+    /**
+     * Checks if a ship of a given size can be placed at a specific coordinate.
+     * @return A result containing if it's possible and how many existing hits it covers.
+     */
     private PlacementResult checkPlacement(Grid grid, int x, int y, int size, boolean horizontal) {
         int hitCount = 0;
         
@@ -104,21 +126,24 @@ public class ExpertReasoner extends AbstractReasoner {
             
             CellState state = grid.getCellState(cx, cy);
             
-            // Se c'è acqua, questa configurazione di nave è impossibile
+            // A MISS (water) means no ship can possibly occupy this cell
             if (state == CellState.MISS) return new PlacementResult(false, 0);
             
             if (state == CellState.HIT) {
                 Ship s = grid.getCell(cx, cy).getShip();
-                // Se la nave in quella cella è già affondata, non può essere questa
+                // If the hit belongs to a ship that is already sunk, this configuration is invalid
                 if (s != null && s.isSunk()) return new PlacementResult(false, 0);
                 
-                // Se è un colpo su una nave ancora viva, aumenta il valore della direzione
+                // If it's a hit on a ship still afloat, it's a high-priority target area
                 hitCount++;
             }
         }
         return new PlacementResult(true, hitCount);
     }
 
+    /**
+     * Simple random picker used as a safety fallback.
+     */
     private Point getRandomMove(Grid grid) {
         List<Point> available = new ArrayList<>();
         for (int x = 0; x < width; x++) {
@@ -129,6 +154,9 @@ public class ExpertReasoner extends AbstractReasoner {
         return available.get(random.nextInt(available.size()));
     }
 
+    /**
+     * Helper class to store the results of a potential placement analysis.
+     */
     private static class PlacementResult {
         final boolean canPlace;
         final int hitCount;
@@ -138,6 +166,7 @@ public class ExpertReasoner extends AbstractReasoner {
             this.hitCount = hitCount;
         }
     }
+
 
     
 

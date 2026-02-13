@@ -3,12 +3,10 @@ package model;
 import java.util.Objects;
 
 /**
- * Configurazione di un tipo di nave:
- * - nome
- * - dimensione
- * - numero di navi da posizionare
- *
- * È una classe IMMUTABILE di configurazione (non una Ship di gioco).
+ * Configuration template for a specific type of ship.
+ * Defines the ship's name, its size (number of cells), and how many 
+ * instances should be placed on the grid.
+ * * This is an IMMUTABLE configuration class, not a game entity.
  */
 public final class ShipConfig {
 
@@ -16,6 +14,13 @@ public final class ShipConfig {
     private final int size;
     private final int count;
 
+    /**
+     * Creates a new ship configuration with validation.
+     * @param name Display name of the ship.
+     * @param size Length of the ship in cells.
+     * @param count How many ships of this type exist in a standard fleet.
+     * @throws IllegalArgumentException if parameters are invalid.
+     */
     public ShipConfig(String name, int size, int count) {
         if (name == null || name.isBlank()) {
             throw new IllegalArgumentException("Ship name cannot be null or blank");
@@ -49,6 +54,10 @@ public final class ShipConfig {
         return name + " (size=" + size + ", count=" + count + ")";
     }
 
+    /**
+     * Value-based equality check. 
+     * Two configurations are considered equal if all their fields match.
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

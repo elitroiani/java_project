@@ -1,7 +1,6 @@
 package placer;
 
 import java.util.List;
-
 import model.GameConfig;
 import model.GameState;
 import model.Ship;
@@ -9,11 +8,8 @@ import model.ShipConfig;
 import player.Player;
 
 /**
- * Piazzamento manuale delle navi tramite click dell'utente.
- * 
- * - Tiene GameConfig per conoscere quali navi piazzare e quante
- * - Piazza una nave alla volta con placeShip
- * - placeAllShips non serve: il controller gestisce il flusso dell'utente
+ * Manages the manual placement of ships via user interaction.
+ * Acts as a bridge between the Controller's click events and the Player's Grid.
  */
 public class ManualShipPlacer {
 
@@ -24,30 +20,25 @@ public class ManualShipPlacer {
     }
 
     /**
-     * Piazza una singola nave sulla griglia del giocatore.
-     * 
-     * @param gameState stato corrente del gioco
-     * @param player giocatore per cui piazzare la nave
-     * @param ship nave da piazzare (tipo e dimensione già definite)
-     * @param x coordinata X selezionata dall'utente
-     * @param y coordinata Y selezionata dall'utente
-     * @param horizontal orientamento scelto dall'utente
-     * @return true se piazzata correttamente, false altrimenti
+     * Attempts to place a single ship on the player's grid.
+     * * @param player The player whose grid will be modified.
+     * @param model 
+     * @param ship The ship instance to be placed.
+     * @param x X coordinate.
+     * @param y Y coordinate.
+     * @param horizontal orientation.
+     * @return true if the grid accepted the placement, false if invalid (overlap or out of bounds).
      */
-    public boolean placeShip(GameState gameState, Player player, Ship ship, int x, int y, boolean horizontal) {
+    public boolean placeShip(GameState model, Player player, Ship ship, int x, int y, boolean horizontal) {
+        // La griglia deve contenere la logica di validazione (canPlaceShip)
+        // all'interno del metodo placeShip stesso.
         return player.getGrid().placeShip(ship, x, y, horizontal);
     }
 
     /**
-     * Restituisce le navi da piazzare secondo GameConfig.
-     * Utile per il controller che gestisce i click dell'utente.
+     * @return The list of ship configurations defined for the current game mode.
      */
     public List<ShipConfig> getShipsToPlace() {
         return config.getShipTypes();
     }
-
-    /**
-     * placeAllShips non ha senso per il piazzamento manuale,
-     * perché l'utente decide manualmente ogni nave.
-     */
 }

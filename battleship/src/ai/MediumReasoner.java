@@ -10,13 +10,23 @@ import model.GameState;
 import model.Grid;
 import player.Player;
 
+/**
+ * AI implementation that simulates a human-like "Targeting" strategy.
+ * Once it hits a ship, it explores adjacent cells and tries to deduce the 
+ * ship's orientation to finish it off.
+ */
 public class MediumReasoner extends AbstractReasoner {
     
-    // Usa Set per evitare duplicati
+    /** Set of potential target coordinates adjacent to successful hits */
     private Set<Point> candidates = new HashSet<>();
+    
+    /** Tracks the last successful hit to determine direction */
     private Point lastHit = null;
+    
+    /** Current orientation of the target ship being attacked */
     private Direction currentDirection = null;
     
+    /** Possible directions for ship orientation */
     public enum Direction { UP, DOWN, LEFT, RIGHT }
     
     public MediumReasoner(Player player, GameConfig config) {
@@ -27,61 +37,59 @@ public class MediumReasoner extends AbstractReasoner {
     public Point chooseMove(GameState state) {
         Grid grid = state.getEnemyGrid(player);
         
-        // 1. Pulisci candidati invalidi (già colpiti)
+        // 1. Clean up: Remove candidates that have already been fired upon
         candidates.removeIf(p -> grid.getCellState(p.x, p.y) != CellState.NOTFIRED);
         
-        // 2. Aggiorna candidati solo se non abbiamo una direzione attiva
+        // 2. Target Mode Initiation: If no specific direction is set, find hits to follow
         if (currentDirection == null) {
             updateCandidatesFromHits(grid);
         }
         
-        // 3. Se abbiamo una direzione, continua in quella direzione
+        // 3. Execution: If we have an active direction, continue striking along that line
         if (currentDirection != null && lastHit != null) {
             Point next = nextInDirection(grid, lastHit, currentDirection);
             
             if (next != null) {
-                candidates.remove(next); // rimuovi dai candidati se presente
+                candidates.remove(next); // Ensure we don't pick this point again from candidates
                 return next;
             } else {
-                // Direzione bloccata, resetta
+                // Direction blocked (edge or miss), reset state to re-evaluate
                 currentDirection = null;
                 lastHit = null;
             }
         }
         
-        // 4. Scegli tra i candidati disponibili
+        // 4. Exploration: Pick from known potential targets (adjacent to previous hits)
         if (!candidates.isEmpty()) {
             Point next = chooseFromCandidates();
             
-            // Aggiorna direzione se abbiamo un lastHit valido
+            // If we have a previous hit, try to determine the direction based on the new move
             if (lastHit != null) {
                 updateDirection(lastHit, next);
             }
             
-            lastHit = next; // aggiorna ultimo colpo
+            lastHit = next; 
             return next;
         }
         
-        // 5. Fallback: scelta casuale (modalità "hunt")
+        // 5. Hunt Mode Fallback: No active targets, perform a random search
         Point randomMove = randomCellPicker(state);
-        lastHit = null; // reset stato
+        lastHit = null; 
         currentDirection = null;
         return randomMove;
     }
     
     /**
-     * Aggiorna i candidati aggiungendo celle adiacenti a tutti gli HIT
+     * Scans the grid for successful hits and adds untouched adjacent cells to candidates.
      */
     private void updateCandidatesFromHits(Grid grid) {
         for (int y = 0; y < grid.getHeight(); y++) {
             for (int x = 0; x < grid.getWidth(); x++) {
                 if (grid.getCellState(x, y) == CellState.HIT) {
-                    // Aggiungi adiacenti non ancora sparati
+                    // Add orthogonal neighbors using the inherited utility
                     candidates.addAll(getAdjacentUntouched(grid, x, y));
                     
-                    // Aggiorna lastHit all'ultimo trovato
-                    // (potrebbe non essere cronologicamente l'ultimo, 
-                    // ma è accettabile per Medium)
+                    // Set as reference point for the next move
                     lastHit = new Point(x, y);
                 }
             }
@@ -89,19 +97,17 @@ public class MediumReasoner extends AbstractReasoner {
     }
     
     /**
-     * Sceglie casualmente tra i candidati, con preferenza per quelli 
-     * allineati con lastHit se disponibili
+     * Selects a coordinate from candidates, preferring those aligned with the last hit.
      */
     private Point chooseFromCandidates() {
         if (lastHit == null || candidates.size() == 1) {
-            // Scelta casuale semplice
             return candidates.stream()
                             .skip(random.nextInt(candidates.size()))
                             .findFirst()
                             .orElseThrow();
         }
         
-        // Preferisci candidati allineati con lastHit (stessa riga o colonna)
+        // Heuristic: Prefer candidates in the same row or column as the last hit
         Set<Point> aligned = new HashSet<>();
         for (Point p : candidates) {
             if (p.x == lastHit.x || p.y == lastHit.y) {
@@ -118,7 +124,7 @@ public class MediumReasoner extends AbstractReasoner {
             return chosen;
         }
         
-        // Altrimenti casuale
+        // Fallback to random candidate selection
         Point chosen = candidates.stream()
                                  .skip(random.nextInt(candidates.size()))
                                  .findFirst()
@@ -128,7 +134,8 @@ public class MediumReasoner extends AbstractReasoner {
     }
     
     /**
-     * Calcola la prossima cella nella direzione specificata
+     * Calculates the next point in a specific direction.
+     * @return Point if valid and untouched, null otherwise.
      */
     private Point nextInDirection(Grid grid, Point from, Direction dir) {
         int nx = from.x;
@@ -150,17 +157,17 @@ public class MediumReasoner extends AbstractReasoner {
     }
     
     /**
-     * Deduce la direzione tra due punti consecutivi
+     * Deduces the ship orientation (Direction) based on the movement between two points.
      */
     private void updateDirection(Point last, Point next) {
         if (last.x == next.x) {
-            // Movimento verticale
+            // Vertical movement identified
             currentDirection = (next.y > last.y) ? Direction.DOWN : Direction.UP;
         } else if (last.y == next.y) {
-            // Movimento orizzontale
+            // Horizontal movement identified
             currentDirection = (next.x > last.x) ? Direction.RIGHT : Direction.LEFT;
         } else {
-            // Movimento diagonale (non dovrebbe accadere con getAdjacentUntouched)
+            // Diagonal movement (safety reset, shouldn't occur in standard play)
             currentDirection = null;
         }
     }

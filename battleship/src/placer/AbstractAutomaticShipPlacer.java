@@ -10,23 +10,40 @@ import model.ShipConfig;
 import player.Player;
 
 /**
- * Classe base per tutti i placer automatici
- * - Condivide il metodo atomico placeShip
- * - Implementa placeAllShips chiamando placeShip
+ * Base implementation for all automatic ship positioning strategies.
+ * It uses the Template Method pattern to handle the fleet iteration logic, 
+ * while delegating specific coordinate selection to subclasses.
  */
 public abstract class AbstractAutomaticShipPlacer implements AutomaticShipPlacer {
 
     protected final GameConfig config;
 
+    /**
+     * Initializes the placer with game settings.
+     * @param config Configuration containing ship types and counts.
+     */
     public AbstractAutomaticShipPlacer(GameConfig config) {
         this.config = config;
     }
 
+    /**
+     * Attempts to place a single ship by delegating to the player's grid.
+     * @return true if the grid accepts the placement, false otherwise.
+     */
     @Override
     public boolean placeShip(GameState gameState, Player player, Ship ship, int x, int y, boolean horizontal) {
         return player.getGrid().placeShip(ship, x, y, horizontal);
     }
 
+    /**
+     * Automatically positions the entire fleet defined in the GameConfig.
+     * It iterates through each ship type and attempts placement until successful 
+     * or until the retry limit is reached.
+     * * @param gameState The current state of the game.
+     * @param player The player whose grid will be populated.
+     * @return A list of successfully placed Ship objects.
+     * @throws IllegalStateException if a ship cannot be placed after 100 attempts.
+     */
     @Override
     public List<Ship> placeAllShips(GameState gameState, Player player) {
         List<Ship> placedShips = new ArrayList<>();
@@ -36,8 +53,10 @@ public abstract class AbstractAutomaticShipPlacer implements AutomaticShipPlacer
                 boolean placed = false;
                 int attempts = 0;
 
-                Ship ship = new Ship(sc); // dichiara qui, fuori dal while
+                // Create the ship instance based on the current configuration
+                Ship ship = new Ship(sc); 
 
+                // Retry loop to handle collisions or out-of-bounds placements
                 while (!placed && attempts < 100) {
                     int x = getX(gameState, player, ship);
                     int y = getY(gameState, player, ship);
@@ -47,19 +66,26 @@ public abstract class AbstractAutomaticShipPlacer implements AutomaticShipPlacer
                     attempts++;
                 }
 
+                // If placement fails consistently, the grid might be too small or congested
                 if (!placed) {
-                    throw new IllegalStateException("Impossibile piazzare nave " + sc.getName());
+                    throw new IllegalStateException("Failed to place ship: " + sc.getName() + " after 100 attempts.");
                 }
 
-                placedShips.add(ship); // ora è visibile
+                placedShips.add(ship); 
             }
         }
 
         return placedShips;
     }
 
-    // --- Metodi astratti per strategia concreta ---
+    // --- Abstract methods to be implemented by concrete strategies (e.g., Random, Clustered) ---
+
+    /** @return The chosen X coordinate for the ship. */
     protected abstract int getX(GameState gameState, Player player, Ship ship);
+
+    /** @return The chosen Y coordinate for the ship. */
     protected abstract int getY(GameState gameState, Player player, Ship ship);
+
+    /** @return True for horizontal orientation, false for vertical. */
     protected abstract boolean isHorizontal(GameState gameState, Player player, Ship ship);
 }
