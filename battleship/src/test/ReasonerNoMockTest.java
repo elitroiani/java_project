@@ -4,12 +4,11 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import ai.MediumReasoner;
+import ai.*;
 import model.*;
 import player.*;
 
 import java.awt.Point;
-import java.util.List;
 
 class ReasonerNoMockTest {
 
@@ -17,7 +16,7 @@ class ReasonerNoMockTest {
     private GameConfig config;
     private Player aiPlayer;
     private Player enemyPlayer;
-    private MediumReasoner reasoner;
+    private Reasoner reasoner;
     private GameState simpleState;
 
     // A simple stub to simulate GameState without complex setup
@@ -25,35 +24,40 @@ class ReasonerNoMockTest {
     class TestGameState extends GameState {
         private final Grid testGrid;
 
-        public TestGameState(Grid grid) {
-            super(); // Assuming default constructor exists
+        public TestGameState(Grid grid, Player p1, GameConfig config) {
+            // Passiamo p1 (l'IA) sia come giocatore 1 che come giocatore 2 
+            // per soddisfare il costruttore della superclasse
+            super(p1, p1, config); 
             this.testGrid = grid;
         }
 
         @Override
         public Grid getEnemyGrid(Player p) {
-            // Always return our test grid regardless of the player
+            // Ignoriamo la logica standard e restituiamo la griglia che vogliamo testare
             return testGrid;
         }
     }
 
     @BeforeEach
     void setUp() {
-        // 1. Initialize real objects
-        config = new GameConfig(); // Assuming default is 10x10
+        // 1. Crea prima la configurazione
+        config = new GameConfig(); 
+        
+        // 2. Crea la griglia
         grid = new Grid(10, 10);
         
-        // 2. Setup players
-        aiPlayer = new HumanPlayer("AI", new Grid(10, 10)); // Dummy grid for AI
-        enemyPlayer = new HumanPlayer("Enemy", grid);      // The grid we target
+        // 3. Crea il Player (Assicurati che AIPlayer sia istanziato qui!)
+        aiPlayer = new AIPlayer("AI", new Grid(10, 10)); 
+        
+        // 4. Ora crea lo stub passandogli l'aiPlayer già esistente
+        simpleState = new TestGameState(grid, aiPlayer, config);
 
-        // 3. Create the Stub GameState holding our target grid
-        simpleState = new TestGameState(grid);
-
-        // 4. Initialize the Reasoner to be tested
-        reasoner = new MediumReasoner(aiPlayer, config);
+        // 5. Infine inizializza il reasoner
+        reasoner = new ExpertReasoner(aiPlayer, config);
+        
+        // Se AIPlayer ha bisogno del reasoner per funzionare, collegalo:
+        aiPlayer.setReasoner(reasoner); 
     }
-
     @Test
     void testFirstMoveIsRandomAndValid() {
         // Scenario: The grid is completely empty (NOTFIRED).

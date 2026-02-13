@@ -146,4 +146,9 @@ public class Cell {
     public int hashCode() {
         return coordinates.hashCode();
     }
+
+    // metodo necessario per i test
+	public void setState(CellState state) {
+		this.state = state;
+	}
 }
