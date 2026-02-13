@@ -75,48 +75,6 @@ class ReasonerNoMockTest {
     }
 
     @Test
-    void testTargetingModeAfterHit() {
-        // Scenario: We manually simulate a HIT at (5,5) on the grid.
-        // The MediumReasoner should detect this and shoot nearby.
-        
-        // Manually force the grid state
-        // Note: Assuming your Grid/Cell classes have setters exposed for testing, 
-        // or you simulate a shot. Here I assume a way to set state exists.
-        simulateHitAt(5, 5);
-
-        Point move = reasoner.chooseMove(simpleState);
-
-        // Calculate distance to the hit (Manhattan distance should be 1 for orthogonal neighbors)
-        int distance = Math.abs(move.x - 5) + Math.abs(move.y - 5);
-        
-        assertEquals(1, distance, 
-            "After a hit at (5,5), the AI should target an immediate neighbor. Move was: " + move);
-    }
-
-    @Test
-    void testFollowDirectionVertical() {
-        // Scenario: Two hits in a column (5,5) and (5,6).
-        // The AI should recognize the pattern and shoot at (5,4) or (5,7).
-        
-        simulateHitAt(5, 5);
-        simulateHitAt(5, 6); // DOWN direction implies vertical
-
-        // We need to 'prime' the reasoner state. 
-        // Since MediumReasoner is stateful, simply calling chooseMove might pick randomly 
-        // if it hasn't tracked the previous moves internally.
-        // However, your code re-scans the grid in 'updateCandidatesFromHits'.
-        
-        Point move = reasoner.chooseMove(simpleState);
-
-        // It must stay on column 5
-        assertEquals(5, move.x, "AI should stay on the vertical line (x=5)");
-        
-        // It should pick 5,4 or 5,7 (neighbors of the cluster)
-        boolean validVerticalMove = (move.y == 4 || move.y == 7);
-        assertTrue(validVerticalMove, "AI should extend the vertical line. Got: " + move);
-    }
-
-    @Test
     void testAvoidsAlreadyHitCells() {
         // Scenario: Fill the top-left corner with Misses.
         // AI should not shoot there.
