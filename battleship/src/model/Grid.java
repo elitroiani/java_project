@@ -3,132 +3,123 @@ package model;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Arrays;
-//import java.util.HashSet;
 import java.util.List;
-//import java.util.Set;
 
 public class Grid {
-	
-	//public static final int SIZE = 10;
-	private final int width;
+    
+    private final int width;
     private final int height;
-	private final Cell[][] cells;
-	private final List<Ship> ships = new ArrayList<>();
-	// private List<Ship> sunkenShips = new ArrayList<>();
-	
-	/*public Grid() {
-        cells = new Cell[SIZE][SIZE];
-        ships = new ArrayList<>();
-        initCells();
-    }*/
-	
-	public Grid(int width, int height) {
+    private final Cell[][] cells;
+    private final List<Ship> ships = new ArrayList<>();
+    
+    public Grid(int width, int height) {
         this.width = width;
         this.height = height;
-        cells = new Cell[width][height];
+        this.cells = new Cell[width][height];
 
-        // inizializza tutte le celle
+        // Inizializza tutte le celle
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 cells[x][y] = new Cell(new Point(x, y));
             }
         }
     }
-	
-	// ---GETTER---
-	public int getWidth() {
+    
+    // --- GETTER ---
+    public int getWidth() {
         return this.width;
     }
 
     public int getHeight() {
-        return this.width;
+        return this.height; // CORRETTO: prima restituiva width
     }
 
     public List<Ship> getShips() {
         return List.copyOf(this.ships);
     }
-	
-	public Cell getCell(int x, int y) {
+    
+    public Cell getCell(int x, int y) {
         if (!isValidCoordinate(x, y)) {
             throw new IndexOutOfBoundsException("Invalid coordinates: " + x + "," + y);
         }
         return cells[x][y];
     }
-	
-	
-	// ---check---
-	public boolean isValidCoordinate(int x, int y) {
+    
+    // --- CHECK ---
+    public boolean isValidCoordinate(int x, int y) {
         return x >= 0 && x < width && y >= 0 && y < height;
     }
-	
-	
-	// --- POSIZIONAMENTO NAVI ---
+    
+    // --- POSIZIONAMENTO NAVI ---
+
     /**
-     * Tenta di posizionare una nave nella griglia
-     * @param ship nave da posizionare
-     * @param startX coordinata iniziale X
-     * @param startY coordinata iniziale Y
-     * @param horizontal orientamento
-     * @return true se posizionamento riuscito
+     * Tenta di posizionare una nave nella griglia rispettando i bordi e la distanza
      */
     public boolean placeShip(Ship ship, int startX, int startY, boolean horizontal) {
-        List<Cell> shipCells = new ArrayList<>();
+        // Usiamo il controllo di fattibilità prima di procedere
+        if (!canPlaceShipAt(ship, startX, startY, horizontal)) {
+            return false;
+        }
 
+        List<Cell> shipCells = new ArrayList<>();
         for (int i = 0; i < ship.getSize(); i++) {
             int x = horizontal ? startX + i : startX;
             int y = horizontal ? startY : startY + i;
 
-            if (!isValidCoordinate(x, y)) return false; // fuori griglia
             Cell cell = getCell(x, y);
-            if (cell.hasShip()) return false; 			// cella occupata
+            cell.placeShip(ship);
             shipCells.add(cell);
         }
 
-        // assegna la nave alle celle
-        for (Cell cell : shipCells) {
-            cell.placeShip(ship);
-        }
         ship.setCells(shipCells);
         ships.add(ship);
         return true;
     }
-    
-/* 			QUESTO è QUELLO FATTO DA CHAT
- *    public boolean canPlaceShip(int startX, int startY, int size, boolean horizontal) {
-        for (int i = 0; i < size; i++) {
+
+    /**
+     * Versione interna di canPlaceShip per supportare startX/startY/horizontal
+     */
+    private boolean canPlaceShipAt(Ship ship, int startX, int startY, boolean horizontal) {
+        for (int i = 0; i < ship.getSize(); i++) {
             int x = horizontal ? startX + i : startX;
             int y = horizontal ? startY : startY + i;
 
-            if (!isValidCoordinate(x, y)) return false;
-            if (getCell(x, y).hasShip()) return false;
+            if (!isValidCoordinate(x, y)) {
+            	return false;
+            }
+            
+            // Controllo 8 celle circostanti + cella stessa
+            if (!isAreaClear(x, y)) {
+            	return false;
+            }
+        }
+        return true;
+    }
 
-            // controllo celle adiacenti
-            for (int dx = -1; dx <= 1; dx++) {
-                for (int dy = -1; dy <= 1; dy++) {
-                    int nx = x + dx;
-                    int ny = y + dy;
-                    if (isValidCoordinate(nx, ny) && getCell(nx, ny).hasShip()) {
-                        return false;
-                    }
+    /**
+     * Helper per verificare se una cella e i suoi vicini sono privi di navi
+     */
+    private boolean isAreaClear(int x, int y) {
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dy = -1; dy <= 1; dy++) {
+                int nx = x + dx;
+                int ny = y + dy;
+                if (isValidCoordinate(nx, ny) && getCell(nx, ny).hasShip()) {
+                    return false;
                 }
             }
         }
         return true;
     }
-*/
-
-	
-	
+    
     // --- COLPI ---
-    /**
-     * Applica un colpo e ritorna il risultato
-     */
     public MoveResult fireAt(int x, int y) {
         Cell cell = getCell(x, y);
         return cell.fire();
     }
 
     public boolean allShipsSunk() {
+        if (ships.isEmpty()) return false;
         for (Ship ship : ships) {
             if (!ship.isSunk()) return false;
         }
@@ -145,64 +136,42 @@ public class Grid {
         ships.clear();
     }
 
-    
-    
-    // METODI AGGIUNTI DA EDDY 
-    // Controllali plss
+    // --- METODI AGGIUNTI DA EDDY (Revisionati) ---
     
     public CellState getCellState(int x, int y) {
-    	return this.getCell(x, y).getState();
+        return this.getCell(x, y).getState();
     }
     
     public List<Cell> getUntouchedCells(){
-    	return Arrays.stream(cells)
-    				 .flatMap(Arrays::stream)
-    				 .filter(s -> s.getState() == CellState.NOTFIRED)
-    				 .toList();
+        return Arrays.stream(cells)
+                     .flatMap(Arrays::stream)
+                     .filter(s -> s.getState() == CellState.NOTFIRED)
+                     .toList();
     }
     
     public List<Ship> shipsRemaining(){
-		return this.ships.stream()
-						 .filter(s -> !s.isSunk())
-						 .toList();
+        return this.ships.stream()
+                         .filter(s -> !s.isSunk())
+                         .toList();
     }
     
+    /**
+     * Controlla se una nave (già configurata con posizioni) può stare in griglia.
+     * Utile se la nave ha già calcolato i suoi Point internamente.
+     */
     public boolean canPlaceShip(Ship ship) {
         for (Point p : ship.getPositions()) {
+            if (!isValidCoordinate(p.x, p.y)) return false;
 
-            // 1️ Controllo coordinate valide
-            if (!isValidCoordinate(p.x, p.y)) {
+            // Il controllo deve essere fatto su .hasShip(), non sullo stato del colpo!
+            // Perché in fase di piazzamento sono tutte NOTFIRED.
+            if (!isAreaClear(p.x, p.y)) {
                 return false;
-            }
-
-            // 2️ Controllo che la cella sia libera
-            if (getCellState(p.x, p.y) != CellState.NOTFIRED) {
-                return false;
-            }
-
-            // 3️ Controllo distanza minima: tutte le 8 celle attorno
-            for (int dx = -1; dx <= 1; dx++) {
-                for (int dy = -1; dy <= 1; dy++) {
-
-                    int nx = p.x + dx;
-                    int ny = p.y + dy;
-
-                    // Salta se fuori griglia
-                    if (!isValidCoordinate(nx, ny)) continue;
-
-                    // Salta la cella stessa
-                    if (nx == p.x && ny == p.y) continue;
-
-                    // Se c'è già una nave vicina → non valido
-                    if (getCellState(nx, ny) != CellState.NOTFIRED) {
-                        return false;
-                    }
-                }
             }
         }
-        // Tutti i controlli passati → la nave può essere piazzata
         return true;
     }
+
 
     
     

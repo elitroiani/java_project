@@ -2,6 +2,7 @@ package player;
 
 import java.awt.Point;
 
+import ai.Reasoner;
 import model.GameState;
 import model.Grid;
 
@@ -16,4 +17,6 @@ public interface Player {
      * Per AIPlayer la mossa è generata dall'IA.
      */
 	Point chooseMove(GameState state);  // ritorna la prossima mossa
+	
+	public Reasoner getReasoner();
 }

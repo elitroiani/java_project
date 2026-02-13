@@ -3,13 +3,7 @@ package ai;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
-
-import model.Cell;
-import model.CellState;
-import model.GameConfig;
-import model.GameState;
-import model.Grid;
-import model.Ship;
+import model.*;
 import player.Player;
 
 public class ExpertReasoner extends AbstractReasoner {
@@ -30,34 +24,35 @@ public class ExpertReasoner extends AbstractReasoner {
         Grid grid = state.getEnemyGrid(player);
         updateProbability(state);
         
-        double max = Double.NEGATIVE_INFINITY;
+        double max = -1.0;
         List<Point> candidates = new ArrayList<>();
         
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                if (grid.getCellState(x, y) != CellState.NOTFIRED)
-                    continue;
+                // Spara solo dove non ha mai sparato
+                if (grid.getCellState(x, y) != CellState.NOTFIRED) continue;
                 
                 double value = probabilityGrid[x][y];
                 if (value > max) {
                     max = value;
                     candidates.clear();
                     candidates.add(new Point(x, y));
-                } else if (value == max) {
+                } else if (value == max && max >= 0) {
                     candidates.add(new Point(x, y));
                 }
             }
         }
         
+        // Se non ci sono candidati (caso limite), spara a caso tra i rimanenti
+        if (candidates.isEmpty()) return getRandomMove(grid);
+        
         return candidates.get(random.nextInt(candidates.size()));
     }
     
     private void updateProbability(GameState state) {
-        // Reset griglia probabilità
+        // Reset griglia
         for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                probabilityGrid[x][y] = 0;
-            }
+            for (int x = 0; x < width; x++) probabilityGrid[x][y] = 0;
         }
         
         Grid grid = state.getEnemyGrid(player);
@@ -66,127 +61,84 @@ public class ExpertReasoner extends AbstractReasoner {
         for (Ship ship : remainingShips) {
             int size = ship.getSize();
             
-            // ORIZZONTALE
+            // Analisi Orizzontale
             for (int y = 0; y < height; y++) {
                 for (int x = 0; x <= width - size; x++) {
-                    PlacementResult result = canPlaceHorizontal(grid, x, y, size);
-                    
+                    PlacementResult result = checkPlacement(grid, x, y, size, true);
                     if (result.canPlace) {
-                        // Se attraversa un HIT di nave viva, peso 10x
-                        double weight = result.hasActiveHit ? 10.0 : 1.0;
-                        
-                        for (int i = 0; i < size; i++) {
-                            probabilityGrid[x + i][y] += weight;
-                        }
+                        applyWeight(x, y, size, true, result.hitCount);
                     }
                 }
             }
             
-            // VERTICALE
+            // Analisi Verticale
             for (int x = 0; x < width; x++) {
                 for (int y = 0; y <= height - size; y++) {
-                    PlacementResult result = canPlaceVertical(grid, x, y, size);
-                    
+                    PlacementResult result = checkPlacement(grid, x, y, size, false);
                     if (result.canPlace) {
-                        double weight = result.hasActiveHit ? 10.0 : 1.0;
-                        
-                        for (int i = 0; i < size; i++) {
-                            probabilityGrid[x][y + i] += weight;
-                        }
+                        applyWeight(x, y, size, false, result.hitCount);
                     }
                 }
             }
         }
     }
-    
-    /**
-     * Verifica se una nave può essere piazzata orizzontalmente.
-     * Controlla anche se gli HIT appartengono a navi già affondate.
-     */
-    private PlacementResult canPlaceHorizontal(Grid grid, int x, int y, int size) {
-        boolean hasActiveHit = false;
+
+    private void applyWeight(int x, int y, int size, boolean horizontal, int hitCount) {
+        // Logica Direzionale: Se hitCount è 2, il peso è molto più alto che se fosse 1.
+        // Se hitCount è 0, il peso è 1 (ricerca standard).
+        double weight = (hitCount == 0) ? 1.0 : Math.pow(20.0, hitCount);
         
         for (int i = 0; i < size; i++) {
-            int cx = x + i;
-            int cy = y;
+            int cx = horizontal ? x + i : x;
+            int cy = horizontal ? y : y + i;
+            probabilityGrid[cx][cy] += weight;
+        }
+    }
+
+    private PlacementResult checkPlacement(Grid grid, int x, int y, int size, boolean horizontal) {
+        int hitCount = 0;
+        
+        for (int i = 0; i < size; i++) {
+            int cx = horizontal ? x + i : x;
+            int cy = horizontal ? y : y + i;
             
             CellState state = grid.getCellState(cx, cy);
             
-            // Bloccato da MISS (acqua)
-            if (state == CellState.MISS) {
-                return new PlacementResult(false, false);
-            }
+            // Se c'è acqua, questa configurazione di nave è impossibile
+            if (state == CellState.MISS) return new PlacementResult(false, 0);
             
-            // Se è HIT, verifica se appartiene a nave affondata
             if (state == CellState.HIT) {
-                Cell cell = grid.getCell(cx, cy);
-                Ship ship = cell.getShip();
+                Ship s = grid.getCell(cx, cy).getShip();
+                // Se la nave in quella cella è già affondata, non può essere questa
+                if (s != null && s.isSunk()) return new PlacementResult(false, 0);
                 
-                // Se c'è una nave e questa è affondata, blocca
-                if (ship != null && ship.isSunk()) {
-                    return new PlacementResult(false, false);
-                }
-                
-                // Altrimenti è un HIT di nave viva = BOOST!
-                if (ship != null && !ship.isSunk()) {
-                    hasActiveHit = true;
-                }
+                // Se è un colpo su una nave ancora viva, aumenta il valore della direzione
+                hitCount++;
             }
         }
-        
-        return new PlacementResult(true, hasActiveHit);
+        return new PlacementResult(true, hitCount);
     }
-    
-    /**
-     * Verifica se una nave può essere piazzata verticalmente.
-     * Controlla anche se gli HIT appartengono a navi già affondate.
-     */
-    private PlacementResult canPlaceVertical(Grid grid, int x, int y, int size) {
-        boolean hasActiveHit = false;
-        
-        for (int i = 0; i < size; i++) {
-            int cx = x;
-            int cy = y + i;
-            
-            CellState state = grid.getCellState(cx, cy);
-            
-            // Bloccato da MISS (acqua)
-            if (state == CellState.MISS) {
-                return new PlacementResult(false, false);
-            }
-            
-            // Se è HIT, verifica se appartiene a nave affondata
-            if (state == CellState.HIT) {
-                Cell cell = grid.getCell(cx, cy);
-                Ship ship = cell.getShip();
-                
-                // Se c'è una nave e questa è affondata, blocca
-                if (ship != null && ship.isSunk()) {
-                    return new PlacementResult(false, false);
-                }
-                
-                // Altrimenti è un HIT di nave viva = BOOST!
-                if (ship != null && !ship.isSunk()) {
-                    hasActiveHit = true;
-                }
+
+    private Point getRandomMove(Grid grid) {
+        List<Point> available = new ArrayList<>();
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                if (grid.getCellState(x, y) == CellState.NOTFIRED) available.add(new Point(x, y));
             }
         }
-        
-        return new PlacementResult(true, hasActiveHit);
+        return available.get(random.nextInt(available.size()));
     }
-    
-    /**
-     * Classe helper per ritornare risultato del placement check.
-     */
+
     private static class PlacementResult {
-        final boolean canPlace;      // Può piazzare la nave?
-        final boolean hasActiveHit;  // Attraversa un HIT di nave viva?
-        
-        PlacementResult(boolean canPlace, boolean hasActiveHit) {
+        final boolean canPlace;
+        final int hitCount;
+
+        PlacementResult(boolean canPlace, int hitCount) {
             this.canPlace = canPlace;
-            this.hasActiveHit = hasActiveHit;
+            this.hitCount = hitCount;
         }
     }
+
     
 
     /*	 Flusso Logico Dettagliato

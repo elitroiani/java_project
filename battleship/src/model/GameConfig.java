@@ -10,6 +10,7 @@ public class GameConfig {
 
     private static final int WIDTH = 10;
     private static final int HEIGHT = 10;
+    private static final int NUMBER_OF_SHIPS = 5;
 
     private final List<ShipConfig> shipTypes;
 
@@ -42,5 +43,9 @@ public class GameConfig {
 
 	public int getGridSize() {
 		return this.WIDTH;
+	}
+	
+	public int getShips() {
+		return GameConfig.NUMBER_OF_SHIPS;
 	}
 }

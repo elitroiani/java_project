@@ -2,6 +2,7 @@ package player;
 
 import java.awt.Point;
 
+import ai.Reasoner;
 import model.GameState;
 import model.Grid;
 
@@ -15,6 +16,15 @@ public class HumanPlayer extends AbstractPlayer{
 	public Point chooseMove(GameState state) {
 		// La mossa reale viene fornita dal Controller
         throw new UnsupportedOperationException("Human move must be provided by the controller");
+	}
+
+	public void setReasoner(Reasoner reasoner ) {
+		this.reasoner = reasoner;
+	}
+	
+	@Override
+	public Reasoner getReasoner() {
+		return null;
 	}
 
 }
