@@ -10,7 +10,14 @@ import javax.swing.SwingUtilities;
 public class Main {
 
     public static void main(String[] args) {
-        // Avvio della GUI di selezione
+        // Al primo avvio, mostriamo il menu
+        showDifficultyMenu();
+    }
+
+    /**
+     * Metodo statico richiamabile dal Controller per riaprire il menu iniziale.
+     */
+    public static void showDifficultyMenu() {
         SwingUtilities.invokeLater(() -> {
             StartView startScreen = new StartView();
             startScreen.setVisible(true);
@@ -30,31 +37,35 @@ public class Main {
         // 1. Chiudiamo il menu di selezione
         startScreen.dispose();
 
+    	if (startScreen != null) startScreen.setVisible(false);
         // 2. Configurazione e Griglie
         GameConfig config = new GameConfig(); 
         Grid humanGrid = new Grid(10, 10);
         Grid aiGrid = new Grid(10, 10);
 
-        // 3. Creazione Giocatori (Corpi)
-        // Creiamo l'AI senza passare subito il Reasoner
+        // 3. Creazione Giocatori
         Player human = new HumanPlayer("Comandante", humanGrid);
         AIPlayer ai = new AIPlayer("CPU " + difficulty, aiGrid);
 
-        // 4. Creazione del Cervello (Passando l'AI già esistente)
+        // 4. Creazione del Cervello (Reasoner)
         Reasoner brain = createReasoner(difficulty, ai, config);
         
-        // 5. Connessione: Iniettiamo il cervello nel corpo dell'AI
+        // 5. Iniezione del cervello nell'AI
         ai.setReasoner(brain);
 
         // 6. Inizializzazione MVC
         GameState state = new GameState(human, ai, config);
         BattleView view = new BattleView(10, 10);
 
+        // AZIONE: Questo definisce cosa fare quando il controller chiama "exit"
+        Runnable backToMenuAction = () -> showDifficultyMenu();
         // 7. Il Controller prende il controllo
-        new BattleController(state, view);
+        new BattleController(state, view, backToMenuAction);
 
         // 8. Visualizzazione finestra di gioco
         view.setVisible(true);
+        
+        if (startScreen != null) startScreen.dispose();
     }
 
     /**

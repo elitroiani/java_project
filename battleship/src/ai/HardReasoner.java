@@ -6,14 +6,8 @@ import java.util.List;
 import model.*;
 import player.Player;
 
-/**
- * A more aggressive AI that uses a Heat Map to target ships.
- * It prioritizes cells adjacent to successful hits and applies penalties 
- * to areas around sunken ships.
- */
 public class HardReasoner extends AbstractReasoner {
 
-    /** Matrix representing the "heat" or attractiveness of each cell */
     private int[][] heat;
     private final int width;
     private final int height;
@@ -25,20 +19,13 @@ public class HardReasoner extends AbstractReasoner {
         this.heat = new int[width][height];
     }
 
-    /**
-     * Chooses the next move by selecting the cell with the highest heat value.
-     */
     @Override
     public Point chooseMove(GameState state) {
         Grid grid = state.getEnemyGrid(player);
-        
-        // Refresh the heat map based on the latest grid information
         updateHeat(grid);
 
         int maxHeat = -1;
         List<Point> candidates = new ArrayList<>();
-
-        // Scan only untouched cells using the inherited utility method
         List<Point> available = getUntouchedCells(grid);
         
         for (Point p : available) {
@@ -52,71 +39,99 @@ public class HardReasoner extends AbstractReasoner {
             }
         }
 
-        // If no high-heat zone is found (e.g., at the start or after a ship sinks),
-        // fallback to the intelligent random picker.
+        // Se non c'è calore (fase di caccia), usiamo una strategia a scacchiera
         if (maxHeat <= 1) {
-            return randomCellPicker(state);
+            return checkerboardPicker(state);
         }
         
-        // Randomly pick one of the best candidates (those with max heat)
         return candidates.get(random.nextInt(candidates.size()));
     }
 
-    /**
-     * Updates the heat map values. 
-     * Higher values are assigned to cells next to successful hits.
-     */
     private void updateHeat(Grid grid) {
-        // 1. Reset: initialize all cells with a base heat of 1
+        // 1. Reset base
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 heat[x][y] = 1;
             }
         }
 
-        // 2. Heat Calculation Logic
+        // 2. Calcolo del Calore Strategico
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 Cell cell = grid.getCell(x, y);
                 
-                // If we found a successful hit on an enemy ship
                 if (cell.getState() == CellState.HIT) {
                     Ship ship = cell.getShip();
                     
                     if (ship != null && ship.isSunk()) {
-                        // If the ship is already sunk, penalize neighboring cells 
-                        // as they are unlikely to contain another ship (Standard Rules)
                         applySunkenPenalty(grid, x, y);
                     } else {
-                        // TARGETING MODE: Increase heat for adjacent orthogonal cells
-                        // that have not been fired upon yet.
-                        List<Point> adjacent = getAdjacentUntouched(grid, x, y);
-                        for (Point p : adjacent) {
-                            heat[p.x][p.y] += 10;
-                        }
+                        // --- LOGICA DIREZIONALE ---
+                        // Calore base per le celle adiacenti
+                        applyDirectionalHeat(grid, x, y);
                     }
                 }
-                
-                // If a cell has already been targeted (Hit or Miss), it can't be chosen again
-                if (cell.getState() != CellState.NOTFIRED) {
+            }
+        }
+
+        // 3. Azzeramento celle già colpite (sempre per ultime)
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                if (grid.getCell(x, y).getState() != CellState.NOTFIRED) {
                     heat[x][y] = 0;
                 }
             }
         }
     }
 
+    private void applyDirectionalHeat(Grid grid, int x, int y) {
+        // Direzioni: Destra, Sinistra, Giù, Su
+        int[][] dirs = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+        
+        for (int[] d : dirs) {
+            int nx = x + d[0];
+            int ny = y + d[1];
+
+            if (grid.isValidCoordinate(nx, ny) && grid.getCell(nx, ny).getState() == CellState.NOTFIRED) {
+                // Calore base per adiacenza
+                heat[nx][ny] += 10;
+
+                // CONTROLLO ALLINEAMENTO:
+                // Se nella direzione OPPOSTA a quella in cui sto guardando c'è un altro HIT,
+                // significa che ho trovato la direzione della nave! Aumento molto il calore.
+                int ox = x - d[0];
+                int oy = y - d[1];
+                if (grid.isValidCoordinate(ox, oy) && grid.getCell(ox, oy).getState() == CellState.HIT) {
+                    heat[nx][ny] += 25; // Bonus direzione: la nave "prosegue" qui
+                }
+            }
+        }
+    }
+
     /**
-     * Sets heat to 0 for all surrounding cells (including diagonals) 
-     * once a ship is confirmed as sunk.
+     * Strategia a scacchiera per la fase di caccia: 
+     * spara solo dove (x + y) è pari. Dimezza i turni di ricerca.
      */
+    private Point checkerboardPicker(GameState state) {
+        Grid grid = state.getEnemyGrid(player);
+        List<Point> available = getUntouchedCells(grid);
+        List<Point> checkerboard = new ArrayList<>();
+        
+        for (Point p : available) {
+            if ((p.x + p.y) % 2 == 0) {
+                checkerboard.add(p);
+            }
+        }
+        
+        if (checkerboard.isEmpty()) return randomCellPicker(state);
+        return checkerboard.get(random.nextInt(checkerboard.size()));
+    }
+
     private void applySunkenPenalty(Grid grid, int x, int y) {
-        // Iterate through the 3x3 area centered on the hit
         for (int dx = -1; dx <= 1; dx++) {
             for (int dy = -1; dy <= 1; dy++) {
                 int nx = x + dx;
                 int ny = y + dy;
-                
-                // Ensure the penalty is only applied within grid boundaries
                 if (grid.isValidCoordinate(nx, ny)) {
                     heat[nx][ny] = 0;
                 }

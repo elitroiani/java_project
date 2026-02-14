@@ -95,8 +95,8 @@ public class GameState {
      * Clears both players' grids to prepare for a new match.
      */
     public void reset() {
-        humanPlayer.getGrid().reset();
-        aiPlayer.getGrid().reset();
+        this.getHumanPlayer().getGrid().reset();
+        this.getAiPlayer().getGrid().reset();
     }
     
     // --- GETTERS ---

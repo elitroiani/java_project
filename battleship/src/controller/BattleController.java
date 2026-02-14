@@ -4,30 +4,55 @@ import model.*;
 import view.BattleView;
 import placer.*;
 import player.*;
+// Importa la tua classe Main qui, es: import main.Main;
+
 import java.awt.Point;
 import java.awt.Color;
 import java.util.List;
-import javax.swing.Timer; // Fondamentale usare questo!
+import javax.swing.Timer;
+
+import battleship.Main;
 
 public class BattleController {
     private final GameState model;
     private final BattleView view;
+    
+    // Questa è la nostra "Callback": un'azione generica da eseguire per uscire
+    private final Runnable exitAction;
+    
     private final ManualShipPlacer humanPlacer;
     private final List<ShipConfig> shipsToPlace;
     
     private int currentShipIndex = 0;
     private boolean isBattlePhase = false;
+    
+    // Teniamo un riferimento al timer per poterlo fermare se usciamo
+    private Timer aiTimer; 
 
-    public BattleController(GameState model, BattleView view) {
+    public BattleController(GameState model, BattleView view, Runnable exitAction) {
         this.model = model;
         this.view = view;
+        this.exitAction = exitAction; // Salviamo l'azione per dopo
+        
         this.humanPlacer = new ManualShipPlacer(model.getConfig());
         this.shipsToPlace = model.getConfig().getShipTypes();
 
+        // Tasto "Reset Griglia" (durante il setup)
+        this.view.setResetPlacementListener(e -> resetHumanPlacement());
+        
+        // Tasto "Torna al Menu" (Fine partita o tasto in alto)
+        this.view.setRestartListener(e -> returnToMenu());
+        // Se hai aggiunto il tasto "Nuova Partita" in alto, usa lo stesso metodo:
+        // this.view.setGlobalRestartListener(e -> returnToMenu());
+        this.view.setMenuListener(e -> returnToMenu());
+        
         initController();
     }
 
     private void initController() {
+        // Assicuriamoci che l'IA parta pulita
+        model.getAiPlayer().getGrid().reset();
+        
         // 1. Setup IA
         AutomaticShipPlacer aiPlacer = new HardShipPlacer(model.getConfig());
         aiPlacer.placeAllShips(model, model.getAiPlayer());
@@ -43,6 +68,50 @@ public class BattleController {
         }
         updatePlacementStatus();
     }
+
+    // --- LOGICA DI NAVIGAZIONE ---
+
+    /**
+     * Pulisce solo la griglia dell'utente per permettergli di riprovare il posizionamento.
+     */
+    private void resetHumanPlacement() {
+        if (isBattlePhase) return; 
+        
+        currentShipIndex = 0;
+        model.getHumanPlayer().getGrid().reset();
+        view.resetGrids();
+        updatePlacementStatus();
+        view.setStatus("Griglia pulita. Ricomincia il posizionamento.");
+    }
+
+    /**
+     * Chiude la battaglia e torna al Menu Principale per cambiare difficoltà.
+     */
+    private void returnToMenu() {
+        // 1. IMPORTANTE: Ferma l'IA se sta "pensando"
+        if (aiTimer != null && aiTimer.isRunning()) {
+            aiTimer.stop();
+        }
+
+        // 2. Chiude la finestra di gioco attuale
+        
+
+        if (exitAction != null) {
+            exitAction.run();
+        }
+        // 3. Riapre il menu principale
+        // ATTENZIONE: Sostituisci 'Main' con il nome della tua classe di avvio
+        // e 'showDifficultyMenu' con il tuo metodo statico per mostrare il menu.
+        
+        // Esempio
+        view.dispose();
+        System.out.println("Ritorno al menu principale..."); // Log di debug
+        
+        // Se non hai un metodo statico, puoi istanziare il menu qui:
+        // new view.StartView().setVisible(true);
+    }
+
+    // --- LOGICA DI GIOCO ---
 
     private void handlePlacementClick(int x, int y) {
         if (isBattlePhase) return;
@@ -82,10 +151,8 @@ public class BattleController {
     private void handleBattleClick(int x, int y) {
         if (!isBattlePhase || model.isGameOver()) return;
         
-        // Controllo se la cella è già stata colpita (gestito dal model)
         MoveResult res = model.gameMove(model.getHumanPlayer(), new Point(x, y));
-        
-        if (res == MoveResult.ALREADY_FIRED) return; // Non fare nulla
+        if (res == MoveResult.ALREADY_FIRED) return;
 
         updateCellView(true, x, y, res);
 
@@ -96,12 +163,12 @@ public class BattleController {
 
         if (res == MoveResult.MISS) {
             view.setStatus("Mancato! Tocca alla CPU...");
-            view.disableEnemyGrid(); // Metodo da aggiungere alla tua View
+            view.disableEnemyGrid();
             
-            // Ritardo di 1 secondo per realismo
-            Timer timer = new Timer(1000, e -> executeAiTurn());
-            timer.setRepeats(false);
-            timer.start();
+            // Usiamo il campo della classe aiTimer invece di crearne uno locale
+            aiTimer = new Timer(1000, e -> executeAiTurn());
+            aiTimer.setRepeats(false);
+            aiTimer.start();
         } else {
             view.setStatus("COLPITO! Hai un altro colpo.");
         }
@@ -121,12 +188,12 @@ public class BattleController {
 
         if (aiRes != MoveResult.MISS) {
             view.setStatus("La CPU ha colpito! Mira ancora...");
-            Timer timer = new Timer(1000, e -> executeAiTurn());
-            timer.setRepeats(false);
-            timer.start();
+            aiTimer = new Timer(1000, e -> executeAiTurn());
+            aiTimer.setRepeats(false);
+            aiTimer.start();
         } else {
             view.setStatus("La CPU ha mancato. Tocca a te!");
-            view.enableEnemyGrid(); // Metodo da aggiungere alla tua View
+            view.enableEnemyGrid();
         }
     }
 
@@ -155,7 +222,6 @@ public class BattleController {
 
     private void finishGame() {
         String winner = model.getWinner().getName();
-        view.setStatus("FINE! Vincitore: " + winner);
-        view.disableEnemyGrid();
+        view.showResults(winner);
     }
 }

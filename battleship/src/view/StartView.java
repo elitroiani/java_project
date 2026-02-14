@@ -9,7 +9,7 @@ public class StartView extends JFrame {
 
     public StartView() {
         setTitle("Battaglia Navale - Seleziona Difficoltà");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(400, 500);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
