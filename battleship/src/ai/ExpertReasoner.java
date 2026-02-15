@@ -37,8 +37,10 @@ public class ExpertReasoner extends AbstractReasoner {
         
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                // Only consider cells that haven't been targeted yet
-                if (grid.getCellState(x, y) != CellState.NOTFIRED) continue;
+                // MODIFICA: Utilizziamo isPotentialTarget invece di controllare solo NOTFIRED.
+                // Questo esclude automaticamente le diagonali delle navi affondate 
+                // e le celle dove non può fisicamente esserci una nave.
+                if (!grid.isPotentialTarget(x, y)) continue;
                 
                 double value = probabilityGrid[x][y];
                 // Identify cells with the highest probability score
@@ -53,6 +55,7 @@ public class ExpertReasoner extends AbstractReasoner {
         }
         
         // Fallback to a random valid move if no candidates are found (edge case)
+        // Nota: Assicurati che anche getRandomMove usi isPotentialTarget come filtro.
         if (candidates.isEmpty()) return getRandomMove(grid);
         
         // Pick one coordinate randomly among those with the highest probability
@@ -124,17 +127,21 @@ public class ExpertReasoner extends AbstractReasoner {
             int cx = horizontal ? x + i : x;
             int cy = horizontal ? y : y + i;
             
+            // 1. Controllo base: confini e colpi mancati
+            if (!grid.isValidCoordinate(cx, cy)) return new PlacementResult(false, 0);
             CellState state = grid.getCellState(cx, cy);
-            
-            // A MISS (water) means no ship can possibly occupy this cell
             if (state == CellState.MISS) return new PlacementResult(false, 0);
             
+            // 2. IL FIX PER LE DIAGONALI:
+            // Se la cella che stiamo analizzando è adiacente a una nave già affondata,
+            // quella posizione è illegale secondo le regole del gioco.
+            if (!grid.isAreaClearOfSunkenShips(cx, cy)) {
+                return new PlacementResult(false, 0);
+            }
+
             if (state == CellState.HIT) {
                 Ship s = grid.getCell(cx, cy).getShip();
-                // If the hit belongs to a ship that is already sunk, this configuration is invalid
                 if (s != null && s.isSunk()) return new PlacementResult(false, 0);
-                
-                // If it's a hit on a ship still afloat, it's a high-priority target area
                 hitCount++;
             }
         }

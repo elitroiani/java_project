@@ -49,7 +49,7 @@ public abstract class AbstractReasoner implements Reasoner {
      * @return A list of Point objects representing untouched coordinates.
      */
     protected List<Point> getUntouchedCells(Grid grid) {
-        return grid.getUntouchedCells().stream()                        
+        return grid.getSmartUntouchedCells().stream()                        
                                        .map(s -> s.getCoordinates())
                                        .toList(); 
     }

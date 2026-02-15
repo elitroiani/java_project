@@ -3,12 +3,12 @@ package test;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import controller.BattleController;
 import model.*;
 import player.*;
 import view.BattleView;
-import java.awt.Color;
-import java.awt.event.ActionListener;
+import java.awt.Point;
 
 class BattleControllerTest {
 
@@ -17,59 +17,65 @@ class BattleControllerTest {
     private GameConfig config;
     private MockBattleView mockView;
 
-    /**
-     * Uno "Stub" manuale della BattleView. 
-     * Implementa i metodi della View ma non disegna nulla a schermo.
-     */
+    // Mock minimalista: sovrascriviamo solo quello che serve per non far crashare il test
     class MockBattleView extends BattleView {
         public String lastStatus = "";
-        public boolean enemyGridEnabled = true;
+        public boolean battleStarted = false;
 
         public MockBattleView() {
-            super(10, 10); // Chiama il costruttore di JFrame ma lo terremo nascosto
-            setVisible(false); 
+            super(10, 10);
+            setVisible(false);
         }
 
         @Override public void setStatus(String s) { this.lastStatus = s; }
-        @Override public void updateCell(boolean enemy, int x, int y, Color c, String s) {}
-        @Override public void setPlayerListener(int x, int y, ActionListener l) {}
-        @Override public void setEnemyListener(int x, int y, ActionListener l) {}
-        @Override public void hideSetup() {}
-        @Override public void disableEnemyGrid() { this.enemyGridEnabled = false; }
-        @Override public void enableEnemyGrid() { this.enemyGridEnabled = true; }
-        @Override public boolean isHorizontal() { return true; }
+        @Override public void switchToPlayMode() { this.battleStarted = true; }
+        @Override public void updateCell(boolean e, int x, int y, java.awt.Color c, String s) {}
+        @Override public void refreshView() {}
+        @Override public void showResults(String w) {}
     }
 
     @BeforeEach
     void setUp() {
         config = new GameConfig();
-        // Creiamo un model reale con due giocatori
-        Player p1 = new HumanPlayer("Umano", new Grid(10, 10));
+        
+        Player p1 = new HumanPlayer("TestPlayer", new Grid(10, 10));
         Player p2 = new AIPlayer("CPU", new Grid(10, 10));
         model = new GameState(p1, p2, config);
         
         mockView = new MockBattleView();
-        
-        // Inizializziamo il controller con il nostro mock
-        controller = new BattleController(model, mockView, null);
+        controller = new BattleController(model, mockView, () -> {});
     }
 
     @Test
-    void testInitialPlacementStatus() {
-        // Verifica che all'inizio il controller chieda di piazzare la prima nave
-        String status = mockView.lastStatus;
-        assertTrue(status.contains("Piazza"), "Il controller dovrebbe iniziare in modalità posizionamento");
+    void testInitialStatus() {
+        // Verifica che il controller chieda di piazzare la prima nave
+        assertNotNull(mockView.lastStatus);
+        assertTrue(mockView.lastStatus.contains("Piazza"), "Lo stato iniziale dovrebbe essere il piazzamento.");
     }
 
     @Test
-    void testGameFlowSwitching() {
-        // Forza l'inizio della battaglia (saltando il posizionamento manuale per brevità)
-        // In un test reale useremmo dei riflessi o chiameremmo handlePlacementClick ripetutamente
+    void testPlacementAndTransition() {
+        // 1. Reset esplicito della config nel test per essere sicuri
+        config.getShipTypes().clear();
+        config.getShipTypes().add(new ShipConfig("Nave1", 2, 1));
+        config.getShipTypes().add(new ShipConfig("Nave2", 2, 1));
         
-        // Verifichiamo che se il gioco finisce, lo stato della View cambi
-        // (Simuliamo l'affondamento di tutte le navi tramite il model)
-        // Questo dipende da come il tuo model gestisce le navi.
+        // Re-inizializziamo il controller per leggere la nuova config
+        controller = new BattleController(model, mockView, () -> {});
+
+        System.out.println("Navi attese: " + config.getShipTypes().size());
+
+        // 2. Eseguiamo i piazzamenti
+        simulatePlacement(0, 0); // Piazza la prima
+        System.out.println("Dopo 1° piazzamento - Navi nel model: " + model.getHumanPlayer().getGrid().getShips().size());
         
-        assertNotNull(controller);
+        simulatePlacement(0, 1); // Piazza la seconda (su riga diversa per evitare collisioni)
+        System.out.println("Dopo 2° piazzamento - Navi nel model: " + model.getHumanPlayer().getGrid().getShips().size());
+
+        // 3. Verifica finale
+        assertEquals(2, model.getHumanPlayer().getGrid().getShips().size(), "Il model dovrebbe avere 2 navi.");
+        
+        // Se questo fallisce, guarda il valore di battleStarted
+        assertTrue(mockView.battleStarted, "Il controller non ha chiamato switchToPlayMode! Ultimo stato: " + mockView.lastStatus);
     }
 }

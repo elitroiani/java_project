@@ -6,7 +6,6 @@ import java.awt.Dimension;
 
 public class CellView extends JButton {
     // Rimosso il riferimento al Model per puro MVC
-    
     public CellView() {
         this.setPreferredSize(new Dimension(50, 50));
         this.setBackground(Color.BLUE); // Stato iniziale
