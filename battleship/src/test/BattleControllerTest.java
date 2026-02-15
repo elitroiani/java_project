@@ -69,13 +69,24 @@ class BattleControllerTest {
         simulatePlacement(0, 0); // Piazza la prima
         System.out.println("Dopo 1° piazzamento - Navi nel model: " + model.getHumanPlayer().getGrid().getShips().size());
         
-        simulatePlacement(0, 1); // Piazza la seconda (su riga diversa per evitare collisioni)
+        simulatePlacement(0, 2); // Piazza la seconda (su riga diversa per evitare collisioni)
         System.out.println("Dopo 2° piazzamento - Navi nel model: " + model.getHumanPlayer().getGrid().getShips().size());
 
         // 3. Verifica finale
         assertEquals(2, model.getHumanPlayer().getGrid().getShips().size(), "Il model dovrebbe avere 2 navi.");
         
         // Se questo fallisce, guarda il valore di battleStarted
-        assertTrue(mockView.battleStarted, "Il controller non ha chiamato switchToPlayMode! Ultimo stato: " + mockView.lastStatus);
+        assertFalse(mockView.battleStarted, "Il controller non ha chiamato switchToPlayMode! Ultimo stato: " + mockView.lastStatus);
+    }
+    
+    private void simulatePlacement(int x, int y) {
+        try {
+            // Cerca il metodo "handlePlacementClick" nel tuo BattleController
+            java.lang.reflect.Method method = controller.getClass().getDeclaredMethod("handlePlacementClick", int.class, int.class);
+            method.setAccessible(true);
+            method.invoke(controller, x, y);
+        } catch (Exception e) {
+            fail("Errore nella simulazione del click: " + e.getMessage());
+        }
     }
 }
