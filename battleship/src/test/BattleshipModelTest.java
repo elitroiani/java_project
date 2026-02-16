@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import model.*;
+import player.HumanPlayer;
 
 import java.awt.Point;
 import static org.junit.jupiter.api.Assertions.*;
@@ -80,6 +81,9 @@ class BattleshipModelTest {
 
     @Test
     void testAllShipsSunk() {
+    	GameConfig config = new GameConfig();
+    	HumanPlayer p = new HumanPlayer("human", grid);
+    	GameState state = new GameState(p, null, config);
         Ship ship = new Ship(smallShipConfig);
         grid.placeShip(ship, 0, 0, true);
 
@@ -87,5 +91,6 @@ class BattleshipModelTest {
         grid.fireAt(1, 0);
 
         assertTrue(grid.allShipsSunk(), "Grid should report all ships sunk");
+        assertTrue(state.isGameOver(), "Grid Shoul report gameOver");
     }
 }

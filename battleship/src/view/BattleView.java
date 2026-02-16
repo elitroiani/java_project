@@ -61,8 +61,8 @@ public class BattleView extends JFrame {
         southContainer = new JPanel(southLayout);
         
         setupPanel = new JPanel();
-        horizontalRadio = new JRadioButton("Orizzontale", true);
-        JRadioButton verticalRadio = new JRadioButton("Verticale");
+        horizontalRadio = new JRadioButton("Verticale", true);
+        JRadioButton verticalRadio = new JRadioButton("Orizzontale");
         ButtonGroup group = new ButtonGroup();
         group.add(horizontalRadio); group.add(verticalRadio);
         resetPlacementBtn = new JButton("Reset Griglia");

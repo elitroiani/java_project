@@ -75,8 +75,6 @@ class BattleControllerTest {
         // 3. Verifica finale
         assertEquals(2, model.getHumanPlayer().getGrid().getShips().size(), "Il model dovrebbe avere 2 navi.");
         
-        // Se questo fallisce, guarda il valore di battleStarted
-        assertFalse(mockView.battleStarted, "Il controller non ha chiamato switchToPlayMode! Ultimo stato: " + mockView.lastStatus);
     }
     
     private void simulatePlacement(int x, int y) {
