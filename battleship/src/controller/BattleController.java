@@ -147,7 +147,7 @@ public class BattleController {
             symbol = "O";
             view.setStatus(isEnemyGrid ? "Hai mancato! Tocca al nemico." : "Il nemico ha mancato!");
         } else {
-            color = Color.RED; // Rosso per colpita/affondata
+            color = Color.RED; // Rosso per colpita
             symbol = "X";
             view.setStatus(isEnemyGrid ? "Colpita! Ottimo colpo." : "Sei stato colpito!");
         }
@@ -169,7 +169,7 @@ public class BattleController {
             }
 
             // SCANSIONE SMART: Disabilitiamo le celle buffer (inutili da colpire)
-            // Usiamo i tuoi nuovi metodi isPotentialTarget e isAreaClearOfSunkenShips
+            // Usiamo i nuovi metodi isPotentialTarget e isAreaClearOfSunkenShips
             int w = model.getConfig().getWidth();
             int h = model.getConfig().getHeight();
 
@@ -204,9 +204,13 @@ public class BattleController {
     }
 
     private void returnToMenu() {
-        if (aiTimer != null) aiTimer.stop();
+        if (aiTimer != null) {
+        	aiTimer.stop();
+        }
         view.dispose();
-        if (exitAction != null) exitAction.run();
+        if (exitAction != null) {
+        	exitAction.run();
+        }
     }
 
     private void updatePlacementStatus() {
@@ -215,7 +219,9 @@ public class BattleController {
     }
 
     private void finishGame() {
-        if (aiTimer != null) aiTimer.stop();
+        if (aiTimer != null) {
+        	aiTimer.stop();
+        }
         view.showResults(model.getWinner().getName());
     }
 }
