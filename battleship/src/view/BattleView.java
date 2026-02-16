@@ -28,7 +28,7 @@ public class BattleView extends JFrame {
     private JPanel resultPanel;
     private JLabel resultLabel;
     private JButton endRestartBtn;
-
+    
     /**
      * Initializes the view with the specified grid dimensions.
      */
@@ -64,9 +64,11 @@ public class BattleView extends JFrame {
         horizontalRadio = new JRadioButton("Verticale", true);
         JRadioButton verticalRadio = new JRadioButton("Orizzontale");
         ButtonGroup group = new ButtonGroup();
-        group.add(horizontalRadio); group.add(verticalRadio);
         resetPlacementBtn = new JButton("Reset Griglia");
         styleButton(resetPlacementBtn, new Color(231, 76, 60));
+        group.add(horizontalRadio); 
+        group.add(verticalRadio);
+        group.add(resetPlacementBtn);
         setupPanel.add(new JLabel("Orientamento: "));
         setupPanel.add(horizontalRadio);
         setupPanel.add(verticalRadio);
@@ -200,7 +202,10 @@ public class BattleView extends JFrame {
         grid[x][y].setEnabled(false); 
     }
 
-    public void refreshView() { revalidate(); repaint(); }
+    public void refreshView() { 
+    	revalidate(); 
+    	repaint(); 
+    }
     
     /**
      * Transitions the UI to the battle phase.
@@ -208,6 +213,9 @@ public class BattleView extends JFrame {
     public void switchToPlayMode() {
         southLayout.show(southContainer, "RESULT");
         resultPanel.setVisible(false);
+        for (Component c : setupPanel.getComponents()) {
+            c.setVisible(false); // Nasconde i bottoni/label interni
+        }
         statusLabel.setText("BATTAGLIA! Fuoco al nemico.");
         refreshView();
     }
