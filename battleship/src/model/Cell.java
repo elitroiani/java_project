@@ -1,6 +1,7 @@
 package model;
 
 import java.awt.Point;
+import java.util.Optional;
 
 /**
  * Represents a single square (cell) on the battlefield.
@@ -10,7 +11,7 @@ public class Cell {
 	
     private CellState state = CellState.NOTFIRED;
     private final Point coordinates; 				// Final: a cell's position is immutable
-    private Ship ship; 								// Reference to the ship occupying this cell (null if empty)
+    private Optional<Ship> ship; 								// Reference to the ship occupying this cell (null if empty)
 	
     /**
      * Initializes a cell at the specified coordinates.
@@ -30,7 +31,7 @@ public class Cell {
         return this.coordinates;
     }
 	   
-    public Ship getShip() {
+    public Optional<Ship> getShip() {
         return this.ship;
     }
 	
@@ -52,7 +53,7 @@ public class Cell {
         if (this.hasShip()) {
             throw new IllegalStateException("Cell already has a ship at " + coordinates);
         }
-        this.ship = ship;
+        this.ship = Optional.ofNullable(ship);
     }
     
     // --- COMBAT LOGIC ---
@@ -77,10 +78,10 @@ public class Cell {
 
         // 3. Shot hit: Update cell state and notify the ship
         state = CellState.HIT;
-        ship.hit();
+        ship.get().hit();
 
         // Check if this hit was the one that destroyed the ship
-        if (ship.isSunk()) {
+        if (ship.get().isSunk()) {
             return MoveResult.SUNK;
         }
 
@@ -147,7 +148,7 @@ public class Cell {
         return coordinates.hashCode();
     }
 
-    // metodo necessario per i test
+    // method needed for testing
 	public void setState(CellState state) {
 		this.state = state;
 	}

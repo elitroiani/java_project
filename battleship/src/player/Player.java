@@ -1,6 +1,8 @@
 package player;
 
 import java.awt.Point;
+import java.util.Optional;
+
 import ai.Reasoner;
 import model.GameState;
 import model.Grid;
@@ -33,7 +35,7 @@ public interface Player {
      * Retrieves the reasoning strategy currently assigned to the player.
      * @return The Reasoner instance, or null if none is assigned.
      */
-    Reasoner getReasoner();
+    Optional<Reasoner> getReasoner();
 
     /**
      * Assigns a reasoning strategy to the player.

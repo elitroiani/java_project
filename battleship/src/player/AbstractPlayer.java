@@ -1,5 +1,7 @@
 package player;
 
+import java.util.Optional;
+
 import ai.Reasoner;
 import model.Grid;
 
@@ -12,7 +14,7 @@ public abstract class AbstractPlayer implements Player {
 
     protected final String name;
     protected final Grid grid;
-    protected Reasoner reasoner;
+    protected Optional<Reasoner> reasoner;
     
     /**
      * Initializes a player with a name and their respective battlefield.
@@ -46,11 +48,11 @@ public abstract class AbstractPlayer implements Player {
      * @param reasoner The strategy implementation to be used.
      */
     public void setReasoner(Reasoner reasoner) {
-        this.reasoner = reasoner;
+        this.reasoner = Optional.of(reasoner);
     }
 
     @Override
-    public Reasoner getReasoner() {
+    public Optional<Reasoner> getReasoner() {
         return this.reasoner;
     }
 

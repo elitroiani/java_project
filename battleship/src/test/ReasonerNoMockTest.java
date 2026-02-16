@@ -25,39 +25,40 @@ class ReasonerNoMockTest {
         private final Grid testGrid;
 
         public TestGameState(Grid grid, Player p1, GameConfig config) {
-            // Passiamo p1 (l'IA) sia come giocatore 1 che come giocatore 2 
-            // per soddisfare il costruttore della superclasse
+            // We pass p1 (the AI) as both player 1 and player 2 
+        	// to satisfy the superclass constructor
             super(p1, p1, config); 
             this.testGrid = grid;
         }
 
         @Override
         public Grid getEnemyGrid(Player p) {
-            // Ignoriamo la logica standard e restituiamo la griglia che vogliamo testare
+            // We ignore the standard logic and return the grid we want to test
             return testGrid;
         }
     }
 
     @BeforeEach
     void setUp() {
-        // 1. Crea prima la configurazione
+        // 1. Create the configuration first
         config = new GameConfig(); 
         
-        // 2. Crea la griglia
+        // 2. Create the grid
         grid = new Grid(10, 10);
         
-        // 3. Crea il Player (Assicurati che AIPlayer sia istanziato qui!)
+        // 3. Create the Player (Make sure AIPlayer is instantiated here!)
         aiPlayer = new AIPlayer("AI", new Grid(10, 10)); 
         
-        // 4. Ora crea lo stub passandogli l'aiPlayer già esistente
+        // 4. Now create the stub by passing it the existing aiPlayer
         simpleState = new TestGameState(grid, aiPlayer, config);
 
-        // 5. Infine inizializza il reasoner
+        // 5. Finally initialize the reasoner
         reasoner = new ExpertReasoner(aiPlayer, config);
         
-        // Se AIPlayer ha bisogno del reasoner per funzionare, collegalo:
+        // If AIPlayer needs the reasoner to work, connect it:
         aiPlayer.setReasoner(reasoner); 
     }
+    
     @Test
     void testFirstMoveIsRandomAndValid() {
         // Scenario: The grid is completely empty (NOTFIRED).

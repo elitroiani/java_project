@@ -3,6 +3,8 @@ package ai;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
 import model.*;
 import player.Player;
 
@@ -140,8 +142,8 @@ public class ExpertReasoner extends AbstractReasoner {
             }
 
             if (state == CellState.HIT) {
-                Ship s = grid.getCell(cx, cy).getShip();
-                if (s != null && s.isSunk()) return new PlacementResult(false, 0);
+                Optional<Ship> s = grid.getCell(cx, cy).getShip();
+                if (s != null && s.get().isSunk()) return new PlacementResult(false, 0);
                 hitCount++;
             }
         }
@@ -173,46 +175,4 @@ public class ExpertReasoner extends AbstractReasoner {
             this.hitCount = hitCount;
         }
     }
-
-
-    
-
-    /*	 Flusso Logico Dettagliato
-    
-    Per ogni cella (cx, cy) nella posizione candidata:
-
-    1. Leggi CellState
-       ├─ MISS? → ❌ Blocca placement (return false)
-       └─ HIT? → Vai al punto 2
-
-    2. Ottieni Cell e Ship
-       cell = grid.getCell(cx, cy)
-       ship = cell.getShip()
-       
-    3. Controlla stato nave
-       ├─ ship == null? → ⚠️ Anomalia (HIT senza nave)
-       │                   → Ignora e continua
-       │
-       ├─ ship.isSunk() == true? → ❌ Nave affondata
-       │                            → Blocca placement (return false)
-       │
-       └─ ship.isSunk() == false? → ✅ Nave viva!
-                                     → hasActiveHit = true (BOOST 10x)
-    ```
-
-    ---
-
-    ##  Esempio di Esecuzione
-
-    ### Griglia Nemica
-    ```
-        0 1 2 3 4 5
-      ┌─────────────┐
-    0 │ . . . . . . │
-    1 │ . . ✖ . . . │  ← ✖ = Sottomarino (size=1) AFFONDATO
-    2 │ . . X . . . │  ← X = Incrociatore (size=3) 1 HIT, VIVO
-    3 │ . . . . . . │
-      └─────────────┘
-    */
-
 }

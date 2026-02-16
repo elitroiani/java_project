@@ -53,7 +53,7 @@ public class MediumReasoner extends AbstractReasoner {
         // If so, we reset targeting data to stop wasting shots around it.
         if (firstHitOfCurrentShip != null) {
             Cell firstCell = grid.getCell(firstHitOfCurrentShip.x, firstHitOfCurrentShip.y);
-            if (firstCell.hasShip() && firstCell.getShip().isSunk()) {
+            if (firstCell.hasShip() && firstCell.getShip().get().isSunk()) {
                 resetTargeting();
             }
         }
@@ -160,7 +160,7 @@ public class MediumReasoner extends AbstractReasoner {
             for (int x = 0; x < grid.getWidth(); x++) {
                 Cell cell = grid.getCell(x, y);
                 // Cell must be HIT, have a ship, and that ship must be afloat
-                if (cell.getState() == CellState.HIT && cell.hasShip() && !cell.getShip().isSunk()) {
+                if (cell.getState() == CellState.HIT && cell.hasShip() && !cell.getShip().get().isSunk()) {
                     return new Point(x, y);
                 }
             }

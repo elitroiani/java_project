@@ -30,8 +30,8 @@ public class ManualShipPlacer {
      * @return true if the grid accepted the placement, false if invalid (overlap or out of bounds).
      */
     public boolean placeShip(GameState model, Player player, Ship ship, int x, int y, boolean horizontal) {
-        // La griglia deve contenere la logica di validazione (canPlaceShip)
-        // all'interno del metodo placeShip stesso.
+        // The grid must contain the validation logic (canPlaceShip) 
+        // within the placeShip method itself.
         return player.getGrid().placeShip(ship, x, y, horizontal);
     }
 

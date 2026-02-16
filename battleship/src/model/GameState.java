@@ -75,9 +75,15 @@ public class GameState {
      * @return The winning Player object, or null if the game is still in progress.
      */
     public Player getWinner() {
-        if (!isGameOver()) return null;
-        if (humanPlayer.getGrid().allShipsSunk()) return aiPlayer;
-        if (aiPlayer.getGrid().allShipsSunk()) return humanPlayer;
+        if (!isGameOver()) {
+        	return null;
+        }
+        if (humanPlayer.getGrid().allShipsSunk()) {
+        	return aiPlayer;
+        }
+        if (aiPlayer.getGrid().allShipsSunk()) {
+        	return humanPlayer;
+        }
 
         return null; 
     }

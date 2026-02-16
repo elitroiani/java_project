@@ -28,6 +28,6 @@ public class AIPlayer extends AbstractPlayer {
      */
     @Override
     public Point chooseMove(GameState state) {
-        return this.reasoner.chooseMove(state); 
+        return this.reasoner.get().chooseMove(state); 
     }
 }

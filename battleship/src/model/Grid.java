@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Represents the game board.
@@ -85,7 +86,7 @@ public class Grid {
                 if (isValidCoordinate(nx, ny)) {
                     Cell cell = getCell(nx, ny);
                     // If a neighbor is a HIT and the ship it belongs to is SUNK
-                    if (cell.getState() == CellState.HIT && cell.hasShip() && cell.getShip().isSunk()) {
+                    if (cell.getState() == CellState.HIT && cell.hasShip() && cell.getShip().get().isSunk()) {
                         return false;
                     }
                 }
@@ -144,7 +145,9 @@ public class Grid {
     }
 
     public boolean allShipsSunk() {
-        if (ships.isEmpty()) return false;
+        if (ships.isEmpty()) {
+        	return false;
+        }
         return ships.stream().allMatch(Ship::isSunk);
     }
 
@@ -187,8 +190,10 @@ public class Grid {
     public List<Ship> shipsRemaining(){
         return this.ships.stream().filter(s -> !s.isSunk()).toList();
     }
-
-	public Ship getShipAt(int x, int y) {
-		return getCell(x,y).getShip();
-	}
+    
+    public Optional<Ship> getShipAt(int x, int y) {
+        // Supponendo che le celle abbiano un riferimento alla nave
+        Optional<Ship> ship = cells[x][y].getShip(); 
+        return ship;
+    }
 }

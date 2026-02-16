@@ -17,7 +17,7 @@ class BattleControllerTest {
     private GameConfig config;
     private MockBattleView mockView;
 
-    // Mock minimalista: sovrascriviamo solo quello che serve per non far crashare il test
+    // Minimalist mock: we only overwrite what is needed to avoid crashing the test
     class MockBattleView extends BattleView {
         public String lastStatus = "";
         public boolean battleStarted = false;
@@ -48,38 +48,38 @@ class BattleControllerTest {
 
     @Test
     void testInitialStatus() {
-        // Verifica che il controller chieda di piazzare la prima nave
+        // Verify that the controller asks to place the first ship
         assertNotNull(mockView.lastStatus);
         assertTrue(mockView.lastStatus.contains("Piazza"), "Lo stato iniziale dovrebbe essere il piazzamento.");
     }
 
     @Test
     void testPlacementAndTransition() {
-        // 1. Reset esplicito della config nel test per essere sicuri
+        // 1. Explicit config reset in test to be safe
         config.getShipTypes().clear();
         config.getShipTypes().add(new ShipConfig("Nave1", 2, 1));
         config.getShipTypes().add(new ShipConfig("Nave2", 2, 1));
         
-        // Re-inizializziamo il controller per leggere la nuova config
+        // Re-initialize the controller to read the new config
         controller = new BattleController(model, mockView, () -> {});
 
         System.out.println("Navi attese: " + config.getShipTypes().size());
 
-        // 2. Eseguiamo i piazzamenti
-        simulatePlacement(0, 0); // Piazza la prima
+        // 2. Perform the placings
+        simulatePlacement(0, 0); // Places the first
         System.out.println("Dopo 1° piazzamento - Navi nel model: " + model.getHumanPlayer().getGrid().getShips().size());
         
-        simulatePlacement(0, 2); // Piazza la seconda (su riga diversa per evitare collisioni)
+        simulatePlacement(0, 2); // Places the second (on a different line to avoid collisions)
         System.out.println("Dopo 2° piazzamento - Navi nel model: " + model.getHumanPlayer().getGrid().getShips().size());
 
-        // 3. Verifica finale
+        // 3. Final check
         assertEquals(2, model.getHumanPlayer().getGrid().getShips().size(), "Il model dovrebbe avere 2 navi.");
         
     }
     
     private void simulatePlacement(int x, int y) {
         try {
-            // Cerca il metodo "handlePlacementClick" nel tuo BattleController
+            // Look for the "handlePlacementClick" method in BattleController
             java.lang.reflect.Method method = controller.getClass().getDeclaredMethod("handlePlacementClick", int.class, int.class);
             method.setAccessible(true);
             method.invoke(controller, x, y);

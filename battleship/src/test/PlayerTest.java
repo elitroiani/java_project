@@ -13,8 +13,8 @@ class PlayerTest {
 
     @BeforeEach
     void setUp() {
-        // Creiamo una griglia minima solo per soddisfare il costruttore
-        // ed evitare la IllegalArgumentException
+        // We create a minimal grid just to satisfy the constructor 
+    	// and avoid the IllegalArgumentException
         dummyGrid = new Grid(10, 10);
     }
 
@@ -29,7 +29,7 @@ class PlayerTest {
     void testHumanPlayerException() {
         Player human = new HumanPlayer("User", dummyGrid);
         
-        // Ora il costruttore passa, quindi possiamo testare il metodo chooseMove
+        // Now the constructor passes, so we can test the chooseMove method
         assertThrows(UnsupportedOperationException.class, () -> {
             human.chooseMove(null); 
         }, "L'umano deve lanciare UnsupportedOperationException");
@@ -39,7 +39,7 @@ class PlayerTest {
     void testAIPlayerReasonerAssignment() {
         AIPlayer ai = new AIPlayer("Bot", dummyGrid);
         
-        // Verifichiamo il set e get ereditati o implementati
+        // We verify the inherited or implemented set and get
         ai.setReasoner(state -> null);
         assertNotNull(ai.getReasoner());
     }

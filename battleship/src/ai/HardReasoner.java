@@ -3,6 +3,8 @@ package ai;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
 import model.*;
 import player.Player;
 
@@ -78,10 +80,10 @@ public class HardReasoner extends AbstractReasoner {
                 Cell cell = grid.getCell(x, y);
                 
                 if (cell.getState() == CellState.HIT) {
-                    Ship ship = cell.getShip();
+                    Optional<Ship> ship = cell.getShip();
                     
                     // If the ship is sunk, neutralize surrounding area (Standard Rule: ships can't touch)
-                    if (ship != null && ship.isSunk()) {
+                    if (ship != null && ship.get().isSunk()) {
                         applySunkenPenalty(grid, x, y);
                     } else {
                         // TARGETING MODE: Identify ship orientation and boost heat along that axis
