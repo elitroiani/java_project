@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import model.Cell;
 import model.CellState;
 import model.GameConfig;
 import model.GameState;
@@ -41,17 +42,16 @@ public abstract class AbstractReasoner implements Reasoner {
      * @param state The current snapshot of the game.
      * @return The chosen coordinate for the next move.
      */
-    public abstract Point chooseMove(GameState state);
+    public abstract Cell chooseMove(GameState state);
     
     /**
      * Retrieves a list of coordinates for all cells that have not been attacked yet.
      * @param grid The opponent's grid to analyze.
      * @return A list of Point objects representing untouched coordinates.
      */
-    protected List<Point> getUntouchedCells(Grid grid) {
-        return grid.getSmartUntouchedCells().stream()                        
-                                       .map(s -> s.getCoordinates())
-                                       .toList(); 
+    protected List<Cell> getUntouchedCells(Grid grid) {
+        return grid.getSmartUntouchedCells().stream()
+                                       		.toList(); 
     }
     
     /**
@@ -60,10 +60,10 @@ public abstract class AbstractReasoner implements Reasoner {
      * @return A random Point that is valid for a move.
      * @throws IllegalStateException if no untouched cells remain.
      */
-    protected Point randomCellPicker(GameState state) {
+    protected Cell randomCellPicker(GameState state) {
         Grid enemyGrid = state.getEnemyGrid(this.player);
 
-        List<Point> available = getUntouchedCells(enemyGrid);
+        List<Cell > available = getUntouchedCells(enemyGrid);
 
         if (available.isEmpty()) {
             throw new IllegalStateException("No valid moves available");
@@ -80,8 +80,8 @@ public abstract class AbstractReasoner implements Reasoner {
      * @param y The Y coordinate of the reference cell.
      * @return A list of valid adjacent Points in NOTFIRED state.
      */
-    protected List<Point> getAdjacentUntouched(Grid grid, int x, int y) {
-        List<Point> result = new ArrayList<>();
+    protected List<Cell> getAdjacentUntouched(Grid grid, int x, int y) {
+        List<Cell> result = new ArrayList<>();
         // Define orthogonal movements only (up, down, left, right)
         int[][] deltas = {{-1,0},{1,0},{0,-1},{0,1}}; 
 
@@ -92,7 +92,7 @@ public abstract class AbstractReasoner implements Reasoner {
             // Verify coordinates are within bounds and the cell hasn't been attacked
             if (grid.isValidCoordinate(nx, ny) &&
                 grid.getCellState(nx, ny) == CellState.NOTFIRED) {
-                result.add(new Point(nx, ny));
+                result.add(new Cell(nx, ny));
             }
         }
 

@@ -1,6 +1,6 @@
 package player;
 
-import java.awt.Point;
+import model.Cell;
 import model.GameState;
 import model.Grid;
 
@@ -29,7 +29,7 @@ public class HumanPlayer extends AbstractPlayer {
      * must provide the move directly.
      */
     @Override
-    public Point chooseMove(GameState state) {
+    public Cell chooseMove(GameState state) {
         // The actual move is provided by the Controller/GUI interaction.
         throw new UnsupportedOperationException("Human move must be provided by the controller via user interaction");
     }

@@ -32,18 +32,18 @@ public class HardReasoner extends AbstractReasoner {
      * If multiple cells have the same maximum heat, one is picked at random.
      */
     @Override
-    public Point chooseMove(GameState state) {
+    public Cell chooseMove(GameState state) {
         Grid grid = state.getEnemyGrid(player);
         
         // Recalculate the heat map based on the current grid state
         updateHeat(grid);
 
         int maxHeat = -1;
-        List<Point> candidates = new ArrayList<>();
-        List<Point> available = getUntouchedCells(grid);
+        List<Cell> candidates = new ArrayList<>();
+        List<Cell> available = getUntouchedCells(grid);
         
-        for (Point p : available) {
-            int h = heat[p.x][p.y];
+        for (Cell p : available) {
+            int h = heat[p.getX()][p.getY()];
             if (h > maxHeat) {
                 maxHeat = h;
                 candidates.clear();
@@ -136,13 +136,13 @@ public class HardReasoner extends AbstractReasoner {
      * Filters available cells to only those where (x + y) is even.
      * This ensures the AI finds any ship (minimum size 2) in half the turns.
      */
-    private Point checkerboardPicker(GameState state) {
+    private Cell checkerboardPicker(GameState state) {
         Grid grid = state.getEnemyGrid(player);
-        List<Point> available = getUntouchedCells(grid);
-        List<Point> checkerboard = new ArrayList<>();
+        List<Cell> available = getUntouchedCells(grid);
+        List<Cell> checkerboard = new ArrayList<>();
         
-        for (Point p : available) {
-            if ((p.x + p.y) % 2 == 0) {
+        for (Cell p : available) {
+            if ((p.getX() + p.getY()) % 2 == 0) {
                 checkerboard.add(p);
             }
         }

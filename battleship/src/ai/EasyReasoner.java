@@ -1,7 +1,6 @@
 package ai;
 
-import java.awt.Point;
-
+import model.Cell;
 import model.GameConfig;
 import model.GameState;
 import player.Player;
@@ -28,7 +27,7 @@ public class EasyReasoner extends AbstractReasoner {
      * @return A random valid Point to attack.
      */
     @Override
-    public Point chooseMove(GameState state) {
+    public Cell chooseMove(GameState state) {
         // Delegates the selection logic to the random picker defined in AbstractReasoner
         return this.randomCellPicker(state);
     }

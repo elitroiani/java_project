@@ -28,14 +28,14 @@ public class ExpertReasoner extends AbstractReasoner {
     }
     
     @Override
-    public Point chooseMove(GameState state) {
+    public Cell chooseMove(GameState state) {
         Grid grid = state.getEnemyGrid(player);
         
         // Recalculate probabilities for the entire grid based on the current state
         updateProbability(state);
         
         double max = -1.0;
-        List<Point> candidates = new ArrayList<>();
+        List<Cell> candidates = new ArrayList<>();
         
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
@@ -49,16 +49,18 @@ public class ExpertReasoner extends AbstractReasoner {
                 if (value > max) {
                     max = value;
                     candidates.clear();
-                    candidates.add(new Point(x, y));
+                    candidates.add(new Cell(x, y));
                 } else if (value == max && max >= 0) {
-                    candidates.add(new Point(x, y));
+                    candidates.add(new Cell(x, y));
                 }
             }
         }
         
         // Fallback to a random valid move if no candidates are found (edge case)
         // Nota: Assicurati che anche getRandomMove usi isPotentialTarget come filtro.
-        if (candidates.isEmpty()) return getRandomMove(grid);
+        if (candidates.isEmpty()) {
+        	return getRandomMove(grid);
+        }
         
         // Pick one coordinate randomly among those with the highest probability
         return candidates.get(random.nextInt(candidates.size()));
@@ -153,11 +155,11 @@ public class ExpertReasoner extends AbstractReasoner {
     /**
      * Simple random picker used as a safety fallback.
      */
-    private Point getRandomMove(Grid grid) {
-        List<Point> available = new ArrayList<>();
+    private Cell getRandomMove(Grid grid) {
+        List<Cell> available = new ArrayList<>();
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                if (grid.getCellState(x, y) == CellState.NOTFIRED) available.add(new Point(x, y));
+                if (grid.getCellState(x, y) == CellState.NOTFIRED) available.add(new Cell(x, y));
             }
         }
         return available.get(random.nextInt(available.size()));

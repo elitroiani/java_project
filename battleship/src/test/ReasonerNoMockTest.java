@@ -8,8 +8,6 @@ import ai.*;
 import model.*;
 import player.*;
 
-import java.awt.Point;
-
 class ReasonerNoMockTest {
 
     private Grid grid;
@@ -63,16 +61,16 @@ class ReasonerNoMockTest {
     void testFirstMoveIsRandomAndValid() {
         // Scenario: The grid is completely empty (NOTFIRED).
         
-        Point move = reasoner.chooseMove(simpleState);
+        Cell move = reasoner.chooseMove(simpleState);
 
         assertNotNull(move, "The reasoner should return a Point object");
         
         // Verify coordinates are within bounds
-        assertTrue(move.x >= 0 && move.x < 10, "X coordinate out of bounds");
-        assertTrue(move.y >= 0 && move.y < 10, "Y coordinate out of bounds");
+        assertTrue(move.getX() >= 0 && move.getX() < 10, "X coordinate out of bounds");
+        assertTrue(move.getY() >= 0 && move.getY() < 10, "Y coordinate out of bounds");
         
         // Verify it didn't pick a cell that was somehow blocked (impossible on empty grid, but good check)
-        assertEquals(CellState.NOTFIRED, grid.getCellState(move.x, move.y));
+        assertEquals(CellState.NOTFIRED, grid.getCellState(move.getX(), move.getY()));
     }
 
     @Test
@@ -87,8 +85,8 @@ class ReasonerNoMockTest {
 
         // Try multiple times to ensure randomness doesn't accidentally pick one
         for (int i = 0; i < 20; i++) {
-            Point move = reasoner.chooseMove(simpleState);
-            assertFalse(move.x <= 1 && move.y <= 1, 
+            Cell move = reasoner.chooseMove(simpleState);
+            assertFalse(move.getX() <= 1 && move.getY() <= 1, 
                 "AI picked an already visited cell at " + move);
         }
     }
@@ -100,9 +98,9 @@ class ReasonerNoMockTest {
         
         fillGridExcept(9, 9);
         
-        Point move = reasoner.chooseMove(simpleState);
+        Cell move = reasoner.chooseMove(simpleState);
         
-        assertEquals(new Point(9, 9), move, "AI must find the last remaining cell");
+        assertEquals(new Cell(9, 9), move, "AI must find the last remaining cell");
     }
 
     // --- Helper Methods to manipulate the Real Grid ---

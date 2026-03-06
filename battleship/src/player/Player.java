@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.util.Optional;
 
 import ai.Reasoner;
+import model.Cell;
 import model.GameState;
 import model.Grid;
 
@@ -29,7 +30,7 @@ public interface Player {
      * @param state The current state of the game for context.
      * @return The target Point on the opponent's grid, or null if waiting for UI input.
      */
-    Point chooseMove(GameState state);
+    Cell chooseMove(GameState state);
     
     /**
      * Retrieves the reasoning strategy currently assigned to the player.

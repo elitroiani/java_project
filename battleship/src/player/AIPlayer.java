@@ -1,7 +1,7 @@
 package player;
 
-import java.awt.Point;
 import ai.Reasoner;
+import model.Cell;
 import model.GameState;
 import model.Grid;
 
@@ -27,7 +27,7 @@ public class AIPlayer extends AbstractPlayer {
      * @return The next target Point calculated by the AI.
      */
     @Override
-    public Point chooseMove(GameState state) {
+    public Cell chooseMove(GameState state) {
         return this.reasoner.get().chooseMove(state); 
     }
 }

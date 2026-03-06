@@ -43,7 +43,7 @@ class BattleControllerTest {
         model = new GameState(p1, p2, config);
         
         mockView = new MockBattleView();
-        controller = new BattleController(model, mockView, () -> {});
+        controller = new BattleController();
     }
 
     @Test
@@ -61,7 +61,7 @@ class BattleControllerTest {
         config.getShipTypes().add(new ShipConfig("Nave2", 2, 1));
         
         // Re-initialize the controller to read the new config
-        controller = new BattleController(model, mockView, () -> {});
+        controller = new BattleController();
 
         System.out.println("Navi attese: " + config.getShipTypes().size());
 

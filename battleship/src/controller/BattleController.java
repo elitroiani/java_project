@@ -2,6 +2,7 @@ package controller;
 
 import model.*;
 import view.BattleView;
+import view.StartView;
 import placer.*;
 import player.*;
 
@@ -11,7 +12,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+
+import ai.EasyReasoner;
+import ai.ExpertReasoner;
+import ai.HardReasoner;
+import ai.MediumReasoner;
+import ai.Reasoner;
 
 /**
  * The BattleController class acts as the Mediator between the Game Model and the BattleView.
@@ -19,12 +27,12 @@ import javax.swing.Timer;
  * tactical battle phase, while coordinating Human and AI turns.
  */
 public class BattleController {
-    private final GameState model;
-    private final BattleView view;
-    private final Runnable exitAction;				// Callback to return to the main menu
+    private GameState model;
+    private BattleView view;
+    private Runnable exitAction;				// Callback to return to the main menu
     
-    private final ManualShipPlacer humanPlacer;
-    private final List<ShipConfig> shipsToPlace;
+    private ManualShipPlacer humanPlacer;
+    private List<ShipConfig> shipsToPlace;
     
     private int currentShipIndex = 0;
     private boolean isBattlePhase = false;
@@ -34,21 +42,8 @@ public class BattleController {
      * Constructor initializes the controller, sets up listeners, and prepares 
      * the initial placement state.
      */
-    public BattleController(GameState model, BattleView view, Runnable exitAction) {
-        this.model = model;
-        this.view = view;
-        this.exitAction = exitAction;
-        
-        this.humanPlacer = new ManualShipPlacer(model.getConfig());
-        this.shipsToPlace = model.getConfig().getShipTypes();
-
-        // Functional Listeners for UI buttons using Lambda expressions
-        this.view.setResetPlacementListener(e -> resetHumanPlacement());
-        this.view.setMenuListener(e -> returnToMenu());
-        this.view.setRestartListener(e -> returnToMenu());
-        
-        initGridListeners();
-        updatePlacementStatus();
+    public BattleController() {
+ 
     }
 
     /**
@@ -274,4 +269,98 @@ public class BattleController {
     	return points;
     }
     
+    
+    
+    public void launchGame() {
+    	// Launch the application by displaying the difficulty selection menu
+        showDifficultyMenu();
+    }
+    
+    /**
+     * Initializes and displays the Start Menu.
+     * This method is wrapped in SwingUtilities.invokeLater to ensure 
+     * Thread-Safety within the Event Dispatch Thread (EDT).
+     */
+    public void showDifficultyMenu() {
+        SwingUtilities.invokeLater(() -> {
+            StartView startScreen = new StartView();
+            startScreen.setVisible(true);
+
+            // Configure Difficulty Listeners: Each button choice triggers the game launch 
+            // with a specific AI strategy.
+            startScreen.setDifficultyListener("easy", e -> launchGame(startScreen, "EASY"));
+            startScreen.setDifficultyListener("medium", e -> launchGame(startScreen, "MEDIUM"));
+            startScreen.setDifficultyListener("hard", e -> launchGame(startScreen, "HARD"));
+            startScreen.setDifficultyListener("expert", e -> launchGame(startScreen, "EXPERT"));
+        });
+    }
+
+    /**
+     * Orchestrates the setup of a new game session.
+     * It handles the transition from the menu to the main game view, 
+     * initializing the Model, View, and Controller (MVC) components.
+     * @param startScreen The reference to the menu window to be disposed.
+     * @param difficulty  The selected difficulty level string.
+     */
+    private void launchGame(StartView startScreen, String difficulty) {
+        
+        startScreen.dispose();
+        // 1. Cleanup: Dispose of the menu view to free resources
+    	if (startScreen != null) startScreen.setVisible(false);
+        
+    	// 2. Domain Initialization: Set up game rules and grid environments
+        GameConfig config = new GameConfig(); 
+        Grid humanGrid = new Grid(10, 10);
+        Grid aiGrid = new Grid(10, 10);
+
+        // 3. Player Setup: Instantiate the human commander and the CPU opponent
+        Player human = new HumanPlayer("Comandante", humanGrid);
+        AIPlayer ai = new AIPlayer("CPU " + difficulty, aiGrid);
+
+        // 4. Strategy Injection: Use a Factory method to create the AI 'brain' 
+        // based on the chosen difficulty and inject it into the AIPlayer instance.
+        Reasoner brain = createReasoner(difficulty, ai, config);
+        ai.setReasoner(brain);
+        
+        // 5. MVC Assembly: Instantiate the GameState (Model) and the BattleView (View)
+        this.model = new GameState(human, ai, config);
+        this.view = new BattleView(10, 10);
+
+        // 6. Callback Definition: Define the action to be performed when exiting the game 
+        // (returning to the main menu).
+        this.exitAction = () -> showDifficultyMenu();
+
+        this.humanPlacer = new ManualShipPlacer(model.getConfig());
+        this.shipsToPlace = model.getConfig().getShipTypes();
+
+        // Functional Listeners for UI buttons using Lambda expressions
+        this.view.setResetPlacementListener(e -> resetHumanPlacement());
+        this.view.setMenuListener(e -> returnToMenu());
+        this.view.setRestartListener(e -> returnToMenu());
+        
+        initGridListeners();
+        updatePlacementStatus();
+        // 8. Execution: Display the main game board
+        view.setVisible(true);
+        
+        if (startScreen != null) startScreen.dispose();
+    }
+
+    /**
+     * Factory Method for Reasoner instances.
+     * Implements the Strategy Pattern by returning the appropriate AI logic 
+     * based on the user's difficulty selection.
+     * @param level  The difficulty level selected by the user.
+     * @param ai     The AIPlayer context for the reasoner.
+     * @param config The game configuration parameters.
+     * @return A concrete implementation of the Reasoner interface.
+     */
+    private static Reasoner createReasoner(String level, AIPlayer ai, GameConfig config) {
+        return switch (level.toUpperCase()) {
+            case "EXPERT" -> new ExpertReasoner(ai, config);
+            case "HARD"   -> new HardReasoner(ai, config);
+            case "MEDIUM" -> new MediumReasoner(ai, config);
+            default       -> new EasyReasoner(ai, config);
+        };
+    }
 }
