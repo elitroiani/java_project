@@ -1,7 +1,6 @@
 package model;
 
 import java.util.List;
-import java.awt.Point;
 import java.util.ArrayList;
 
 /**
@@ -49,15 +48,15 @@ public class Ship {
         return List.copyOf(this.positions);
     }
     
-    /**
-     * Extracts the coordinates (Points) from the occupied cells.
-     * @return A list of Point objects representing the ship's location.
-     */
-    public List<Point> getPositions(){
-        return this.positions.stream()
-                             .map(Cell::getCoordinates)
-                             .toList();
-    }
+//    /**
+//     * Extracts the coordinates (Points) from the occupied cells.
+//     * @return A list of Point objects representing the ship's location.
+//     */
+//    public List<Point> getPositions(){
+//        return this.positions.stream()
+//                             .map(Cell::getCoordinates)
+//                             .toList();
+//    }
     
     // --- PLACEMENT ---
 

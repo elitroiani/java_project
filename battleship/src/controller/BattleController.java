@@ -7,6 +7,7 @@ import player.*;
 
 import java.awt.Color;
 import java.awt.Point;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -134,7 +135,7 @@ public class BattleController {
         if (!isBattlePhase || model.isGameOver()) return;
         
         // Execute move via Model: Centralized state management
-        MoveResult res = model.gameMove(model.getHumanPlayer(), new Point(x, y));
+        MoveResult res = model.gameMove(model.getHumanPlayer(), new Cell(x, y));
         if (res == MoveResult.ALREADY_FIRED) return;
 
         processMoveResult(true, x, y, res);
@@ -153,10 +154,10 @@ public class BattleController {
      */
     private void startAiTurn() {
         aiTimer = new Timer(1000, e -> {
-            Point aiMove = model.getAiPlayer().chooseMove(model);
+            Cell aiMove = model.getAiPlayer().chooseMove(model);
             MoveResult aiRes = model.gameMove(model.getAiPlayer(), aiMove);
             
-            processMoveResult(false, aiMove.x, aiMove.y, aiRes);
+            processMoveResult(false, aiMove.getX(), aiMove.getY(), aiRes);
 
             if (model.isGameOver()) {
                 finishGame();
@@ -204,7 +205,7 @@ public class BattleController {
             // Highlight the sunken ship visually
             Optional<Ship> sunkShip = targetGrid.getShipAt(x, y);
             if (sunkShip != null) {
-                view.renderSunkenShip(isEnemyGrid, sunkShip.get().getPositions());
+                view.renderSunkenShip(isEnemyGrid, convertToPoints(sunkShip.get().getCells()));
             }
 
             // SMART SCAN: Automatically disable "Buffer cells" around the sunken ship.
@@ -263,4 +264,14 @@ public class BattleController {
         }
         view.showResults(model.getWinner().getName());
     }
+    
+    
+    private List<Point> convertToPoints(List<Cell> cells){
+		List<Point> points = new ArrayList<>();
+		for(Cell c : cells) {
+			points.add(new Point(c.getX(), c.getY()));
+		}
+    	return points;
+    }
+    
 }

@@ -1,6 +1,5 @@
 package model;
 
-import java.awt.Point;
 import java.util.List;
 import player.Player;
 
@@ -52,9 +51,9 @@ public class GameState {
      * @param point The target coordinates.
      * @return The outcome of the move (MISS, HIT, SUNK, or ALREADY_FIRED).
      */
-    public MoveResult gameMove(Player player, Point point) {
+    public MoveResult gameMove(Player player, Cell c) {
         Grid enemyGrid = getEnemyGrid(player);
-        Cell cell = enemyGrid.getCell(point.x, point.y);
+        Cell cell = enemyGrid.getCell(c.getX(), c.getY());
 
         // Directly returns the result of the shot processed by the cell
         return cell.fire();

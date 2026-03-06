@@ -1,6 +1,5 @@
 package model;
 
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -28,7 +27,7 @@ public class Grid {
 
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                cells[x][y] = new Cell(new Point(x, y));
+                cells[x][y] = new Cell(x, y);
             }
         }
     }
@@ -183,7 +182,7 @@ public class Grid {
     public List<Cell> getSmartUntouchedCells() {
         return Arrays.stream(cells)
                      .flatMap(Arrays::stream)
-                     .filter(s -> isPotentialTarget(s.getCoordinates().x, s.getCoordinates().y))
+                     .filter(s -> isPotentialTarget(s.getX(), s.getY()))
                      .toList();
     }
     

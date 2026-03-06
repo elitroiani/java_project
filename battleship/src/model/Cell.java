@@ -10,25 +10,31 @@ import java.util.Optional;
 public class Cell {
 	
     private CellState state = CellState.NOTFIRED;
-    private final Point coordinates; 				// Final: a cell's position is immutable
-    private Optional<Ship> ship; 								// Reference to the ship occupying this cell (null if empty)
+    private final int x;
+    private final int y;
+    private Optional<Ship> ship; 					// Reference to the ship occupying this cell (null if empty)
 	
     /**
      * Initializes a cell at the specified coordinates.
      * @param coordinates The (x, y) position on the grid.
      */
-    public Cell(Point coordinates) {
-        this.coordinates = coordinates;
+    public Cell(int x, int y) {
+        this.x = x;
+        this.y = y;
     }
 
     // --- GETTERS ---
 
-    public CellState getState() {
+	public CellState getState() {
         return this.state;
     }
 	
-    public Point getCoordinates() {
-        return this.coordinates;
+    public int getX() {
+        return this.x;
+    }
+    
+    public int getY() {
+    	return this.y;
     }
 	   
     public Optional<Ship> getShip() {
@@ -51,7 +57,7 @@ public class Cell {
      */
     public void placeShip(Ship ship) {
         if (this.hasShip()) {
-            throw new IllegalStateException("Cell already has a ship at " + coordinates);
+            throw new IllegalStateException("Cell already has a ship at " + getX() + getY());
         }
         this.ship = Optional.ofNullable(ship);
     }
@@ -112,7 +118,7 @@ public class Cell {
     
     @Override
     public String toString() {
-        return "Cell(" + coordinates.x + "," + coordinates.y + ") - " + state;
+        return "Cell(" + getX() + "," + getY() + ") - " + state;
     }
     
     /**
@@ -140,13 +146,13 @@ public class Cell {
         if (this == obj) return true;
         if (!(obj instanceof Cell)) return false;
         Cell other = (Cell) obj;
-        return coordinates.equals(other.coordinates);
+        return (getX() == other.getX() && getY() == other.getY());
     }
 
-    @Override
-    public int hashCode() {
-        return coordinates.hashCode();
-    }
+//    @Override
+//    public int hashCode() {
+//        return coordinates.hashCode();
+//    }
 
     // method needed for testing
 	public void setState(CellState state) {
