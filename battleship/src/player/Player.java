@@ -1,6 +1,5 @@
 package player;
 
-import java.awt.Point;
 import java.util.Optional;
 
 import ai.Reasoner;

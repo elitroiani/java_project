@@ -8,7 +8,6 @@ import controller.BattleController;
 import model.*;
 import player.*;
 import view.BattleView;
-import java.awt.Point;
 
 class BattleControllerTest {
 

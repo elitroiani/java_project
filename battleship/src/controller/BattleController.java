@@ -43,7 +43,7 @@ public class BattleController {
      * the initial placement state.
      */
     public BattleController() {
- 
+    	this.launchGame();
     }
 
     /**

@@ -11,7 +11,6 @@ import controller.BattleController;
 public class Main {
 
     public static void main(String[] args) {
-    	BattleController b = new BattleController();
-    	b.launchGame();
+    	new BattleController();
     }
 }
